@@ -1,0 +1,4 @@
+boto3 
+hermes_core @ git+https://github.com/HERMES-SOC/hermes_core.git # for hermes instrument packages
+pyyaml
+watchdog

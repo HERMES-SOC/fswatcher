@@ -1,0 +1,10 @@
+# Config file for the SDC AWS S3 Watcher
+
+# User to run the SDC AWS S3 Watcher as
+SDC_SYSTEM_USER: "dbarrous"
+# S3 Bucket name to store the data
+SDC_AWS_S3_BUCKET: "damian-sam"
+# Absolute path to watch for new files
+SDC_AWS_WATCH_PATH: "/home/dbarrous/sdc_aws_fswatcher/test_directory"
+# AWS Profile to use for authentication (Optional)
+# SDC_AWS_PROFILE: "smce-swsoc"

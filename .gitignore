@@ -1,0 +1,5 @@
+hermes.log
+test_directory/*
+sdc_aws_fswatcher.service
+venv/
+```
