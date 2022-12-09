@@ -1,4 +1,7 @@
-# Installation script to create a new linux service
+"""
+Installation script to install the sdc_aws_fswatcher service
+"""
+
 import os
 import sys
 
