@@ -14,7 +14,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 ### Setup
 1. Clone the repository
 
-    ```git clone ```
+    ```git clone git@github.com:dbarrous/sdc_aws_fswatcher.git```
 
 2. Install the requirements
 
