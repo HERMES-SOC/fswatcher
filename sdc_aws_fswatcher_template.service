@@ -4,7 +4,7 @@ Description=SDC AWS FSWatcher
 [Service]
 Type=simple
 User=$SDC_SYSTEM_USER$
-ExecStart= $CURRENT_WORKING_DIRECTORY$/venv/bin/python3 sdc_aws_fswatcher.py -d $SDC_AWS_WATCH_PATH$ -b $SDC_AWS_S3_BUCKET$ -p $SDC_AWS_PROFILE$
+ExecStart= $CURRENT_WORKING_DIRECTORY$/venv/bin/python3 sdc_aws_fswatcher.py -d $SDC_AWS_WATCH_PATH$ -b $SDC_AWS_S3_BUCKET$ -t $SDC_AWS_TIMESTREAM_DB$ -tt $SDC_AWS_TIMESTREAM_TABLE$
 WorkingDirectory=$CURRENT_WORKING_DIRECTORY$
 Restart=always
 RestartSec=2

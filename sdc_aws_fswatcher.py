@@ -6,9 +6,16 @@ from datetime import datetime
 from urllib import parse
 import boto3
 import botocore
+import subprocess
 from hermes_core import log
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileCreatedEvent, FileModifiedEvent, FileMovedEvent, FileDeletedEvent
+from watchdog.events import (
+    FileSystemEventHandler,
+    FileCreatedEvent,
+    FileModifiedEvent,
+    FileMovedEvent,
+    FileDeletedEvent,
+)
 
 
 class FileSystemHandler(FileSystemEventHandler):
@@ -16,7 +23,15 @@ class FileSystemHandler(FileSystemEventHandler):
     Subclass to handle file system events
     """
 
-    def __init__(self, path, bucket_name, profile=None, src_limit=100000):
+    def __init__(
+        self,
+        path,
+        bucket_name,
+        timestream_db,
+        timestream_table,
+        profile=None,
+        src_limit=100000,
+    ):
         """
         Overloaded Constructor
         """
@@ -29,7 +44,11 @@ class FileSystemHandler(FileSystemEventHandler):
         # Check if bucket name is and accessible using boto
         try:
             # Initialize Boto3 Session
-            self.boto3_session = boto3.session.Session(profile_name=profile) if profile else boto3.session.Session()
+            self.boto3_session = (
+                boto3.session.Session(profile_name=profile)
+                if profile
+                else boto3.session.Session()
+            )
 
             # Initialize S3 Client
             s3 = self.boto3_session.resource("s3")
@@ -53,6 +72,12 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Initialize the bucket name
         self.bucket_name = bucket_name
+
+        # Initialize the timestream db
+        self.timestream_db = timestream_db
+
+        # Initialize the timestream table
+        self.timestream_table = timestream_table
 
         # Validate the path
         if not os.path.exists(path):
@@ -93,7 +118,6 @@ class FileSystemHandler(FileSystemEventHandler):
         elif isinstance(event, FileDeletedEvent):
             self._file_handler(event.src_path, self.bucket_name, "DELETE")
 
-
     def _file_handler(self, src_path, bucket_name, action_type, dest_path=None):
         """
         Function to handle file events and upload to S3
@@ -102,24 +126,25 @@ class FileSystemHandler(FileSystemEventHandler):
             # Validate Action Type
             if action_type not in ["CREATE", "PUT", "DELETE"]:
                 raise ValueError("Invalid Action Type")
-            
+
             # Skip if duplicate event
             if src_path in self.src and dest_path is not None:
                 return None
 
             # Set path to use
             path_to_use = dest_path if dest_path is not None else src_path
-            
+
             # Capital Case Action Type
             action_type_capped = action_type.capitalize()
             log.info(
                 f"Object ({self._parse_src_path(src_path)}) - File {action_type_capped}: {self._parse_src_path(src_path) + (f' to {dest_path}' if dest_path is not None else '')}"
             )
 
-
             if action_type != "DELETE":
                 # Generate Object Tags String
-                tags = self._generate_object_tags(path_to_use, self._parse_src_path(path_to_use))
+                tags = self._generate_object_tags(
+                    path_to_use, self._parse_src_path(path_to_use)
+                )
 
                 # Upload to S3 Bucket
                 self._upload_to_s3_bucket(
@@ -130,6 +155,15 @@ class FileSystemHandler(FileSystemEventHandler):
                     tags=tags,
                 )
 
+                # TODO: Have a timed execution to sync any files that are not synced
+                # Perform aws s3 sync using AWS CLI
+                # self._sync_to_s3_bucket(
+                #     boto3_session=self.boto3_session,
+                #     src_path=path_to_use,
+                #     bucket_name=bucket_name,
+                #     file_key=self._parse_src_path(path_to_use),
+                # )
+
             # Log to Timestream
             self._log(
                 boto3_session=self.boto3_session,
@@ -138,6 +172,8 @@ class FileSystemHandler(FileSystemEventHandler):
                 new_file_key=self._parse_src_path(path_to_use),
                 source_bucket="SDC External Server",
                 destination_bucket=None if action_type == "DELETE" else bucket_name,
+                timestream_db=self.timestream_db,
+                timestream_table=self.timestream_table,
             )
 
             # Cleans up the src list
@@ -149,14 +185,18 @@ class FileSystemHandler(FileSystemEventHandler):
             self.src.append(src_path)
 
         except Exception as e:
-            log.error({"status": "ERROR", "message": f"Error handling file skipping to next: {e}"})
-
+            log.error(
+                {
+                    "status": "ERROR",
+                    "message": f"Error handling file skipping to next: {e}",
+                }
+            )
 
     def _parse_src_path(self, src_path):
         """
         Function to return parsed src path
         """
-        # Strip path from src_path by splitting on the path by src_path      
+        # Strip path from src_path by splitting on the path by src_path
         parsed_src_path = src_path.split(f"{self.path}/")[1]
 
         return parsed_src_path
@@ -196,7 +236,6 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error generating object tags: {e}"}
             )
 
-
     @staticmethod
     def _upload_to_s3_bucket(boto3_session, src_path, bucket_name, file_key, tags):
         """
@@ -224,6 +263,33 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error uploading to S3 Bucket: {e}"}
             )
 
+    @staticmethod
+    def _sync_to_s3_bucket(src_path, bucket_name, file_key):
+        """
+        Function to Sync a file to an S3 Bucket using AWS CLI
+        """
+        log.info(f"Object ({file_key}) - Syncing file to S3 Bucket ({bucket_name})")
+        try:
+            # Sync to S3 Bucket using AWS CLI and subprocess
+            subprocess.run(
+                [
+                    "aws",
+                    "s3",
+                    "sync",
+                    src_path,
+                    f"s3://{bucket_name}/{file_key}",
+                ],
+                check=True,
+            )
+
+            log.info(
+                f"Object ({file_key}) - Successfully Synced to S3 Bucket ({bucket_name})"
+            )
+
+        except botocore.exceptions.ClientError as e:
+            log.error(
+                {"status": "ERROR", "message": f"Error syncing to S3 Bucket: {e}"}
+            )
 
     @staticmethod
     def _log(
@@ -233,6 +299,8 @@ class FileSystemHandler(FileSystemEventHandler):
         new_file_key=None,
         source_bucket=None,
         destination_bucket=None,
+        timestream_db=None,
+        timestream_table=None,
     ):
         """
         Function to Log to Timestream
@@ -248,8 +316,10 @@ class FileSystemHandler(FileSystemEventHandler):
 
             # Write to Timestream
             timestream.write_records(
-                DatabaseName="sdc_aws_logs",
-                TableName="sdc_aws_s3_bucket_log_table",
+                DatabaseName=timestream_db if timestream_db else "sdc_aws_logs",
+                TableName=timestream_table
+                if timestream_table
+                else "sdc_aws_s3_bucket_log_table",
                 Records=[
                     {
                         "Time": CURRENT_TIME,
@@ -280,7 +350,9 @@ class FileSystemHandler(FileSystemEventHandler):
                 ],
             )
 
-            log.info((f"Object ({new_file_key}) - Event Successfully Logged to Timestream"))
+            log.info(
+                (f"Object ({new_file_key}) - Event Successfully Logged to Timestream")
+            )
 
         except botocore.exceptions.ClientError as e:
             log.error(
@@ -296,9 +368,14 @@ if __name__ == "__main__":
     # Add Argument to parse directory path to be watched
     parser.add_argument("-d", "--directory", help="Directory Path to be Watched")
 
-
     # Add Argument to parse S3 Bucket Name to upload files to
     parser.add_argument("-b", "--bucket_name", help="User name")
+
+    # Add Argument to parse Timestream Database Name
+    parser.add_argument("-t", "--timestream_db", help="Timestream Database Name")
+
+    # Add Argument to parse Timestream Table Name
+    parser.add_argument("-tt", "--timestream_table", help="Timestream Table Name")
 
     # Add Argument to profile to use when connecting to AWS
     parser.add_argument(
@@ -312,7 +389,9 @@ if __name__ == "__main__":
         # Get the absolute path of the directory
         path = os.path.abspath(path)
         bucket_name = args.bucket_name
-        if args.profile != '':
+        timestream_db = args.timestream_db
+        timestream_table = args.timestream_table
+        if args.profile != "":
             profile = args.profile
 
     else:
@@ -321,7 +400,11 @@ if __name__ == "__main__":
 
     # Initialize the FileSystemHandler
     event_handler = FileSystemHandler(
-        path=path, bucket_name=bucket_name, profile=profile
+        path=path,
+        bucket_name=bucket_name,
+        timestream_db=timestream_db,
+        timestream_table=timestream_table,
+        profile=profile,
     )
 
     # Initialize the Observer and start watching

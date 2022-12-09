@@ -24,13 +24,20 @@ print("Installed requirements")
 yaml = __import__("yaml")
 # Parse config file
 try:
-    with open("config.yaml", 'r') as ymlfile:
+    with open("config.yaml", "r") as ymlfile:
         cfg = yaml.load(ymlfile)
 except:
     print("Unable to parse config.yml")
     sys.exit(1)
 
-
+# Verify awscli is installed
+if os.system("which aws") != 0:
+    print("awscli is not installed")
+    sys.exit(1)
+else:
+    print("awscli is installed")
+    # Change permissions on awscli using which aws
+    os.system("sudo chmod -R 755 " + os.popen("which aws").read().strip())
 
 # Verify script exists sdc_aws_fswatcher.py
 if not os.path.exists(abs + "/sdc_aws_fswatcher.py"):
@@ -49,18 +56,23 @@ else:
 
 # Change variables in service file
 filedata = None
-with open(abs + "/sdc_aws_fswatcher_template.service", 'r') as file:
+with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
     filedata = file.read()
 
     # Replace the target string
-    filedata = filedata.replace('$CURRENT_WORKING_DIRECTORY$', abs)
-    filedata = filedata.replace('$SDC_AWS_S3_BUCKET$', cfg['SDC_AWS_S3_BUCKET'])
-    filedata = filedata.replace('$SDC_AWS_WATCH_PATH$', cfg['SDC_AWS_WATCH_PATH'])
-    filedata = filedata.replace('$SDC_AWS_PROFILE$', cfg['SDC_AWS_PROFILE'])
-    filedata = filedata.replace('$SDC_SYSTEM_USER$', cfg['SDC_SYSTEM_USER'])
+    filedata = filedata.replace("$CURRENT_WORKING_DIRECTORY$", abs)
+    filedata = filedata.replace("$SDC_AWS_S3_BUCKET$", cfg["SDC_AWS_S3_BUCKET"])
+    filedata = filedata.replace("$SDC_AWS_WATCH_PATH$", cfg["SDC_AWS_WATCH_PATH"])
+    filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", cfg["SDC_AWS_TIMESTREAM_DB"])
+    filedata = filedata.replace(
+        "$SDC_AWS_TIMESTREAM_TABLE$", cfg["SDC_AWS_TIMESTREAM_TABLE"]
+    )
+    # TODO: Add support for profiles and MFA
+    # filedata = filedata.replace('$SDC_AWS_PROFILE$', cfg['SDC_AWS_PROFILE'])
+    filedata = filedata.replace("$SDC_SYSTEM_USER$", cfg["SDC_SYSTEM_USER"])
 
 # Write the file out again
-with open(abs + "/sdc_aws_fswatcher.service", 'w') as file:
+with open(abs + "/sdc_aws_fswatcher.service", "w") as file:
     file.write(filedata)
 
 # Check if service already exists and remove it
@@ -86,6 +98,3 @@ print("Started service")
 # Verify service is running
 os.system("sudo systemctl status sdc_aws_fswatcher.service")
 print("Service status")
-
-
-

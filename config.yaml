@@ -6,5 +6,11 @@ SDC_SYSTEM_USER: "dbarrous"
 SDC_AWS_S3_BUCKET: "damian-sam"
 # Absolute path to watch for new files
 SDC_AWS_WATCH_PATH: "/home/dbarrous/sdc_aws_fswatcher/test_directory"
+# Timestream database name
+SDC_AWS_TIMESTREAM_DB: "sdc_aws_fswatcher"
+# Timestream table name
+SDC_AWS_TIMESTREAM_TABLE: "logs"
+
+
 # AWS Profile to use for authentication (Optional)
 # SDC_AWS_PROFILE: "smce-swsoc"
