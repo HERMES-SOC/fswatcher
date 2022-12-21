@@ -28,7 +28,7 @@ yaml = __import__("yaml")
 # Parse config file
 try:
     with open("config.yaml", "r") as ymlfile:
-        cfg = yaml.load(ymlfile)
+        cfg = yaml.safe_load(ymlfile)
 except:
     print("Unable to parse config.yaml")
     sys.exit(1)
