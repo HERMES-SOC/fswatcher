@@ -35,7 +35,7 @@ class FileSystemHandlerEvent:
 
         # Set the Source Path
         self.src_path = event.src_path
-        
+
         # Set the Bucket Name
         self.bucket_name = bucket_name
 

@@ -23,7 +23,6 @@ from util import log
 # Configure Logging
 
 
-
 class FileSystemHandler(FileSystemEventHandler):
     """
     Subclass to handle file system events
@@ -49,7 +48,7 @@ class FileSystemHandler(FileSystemEventHandler):
             # Initialize Boto3 Session
             self.boto3_session = (
                 boto3.session.Session(profile_name=config.profile)
-                if config.profile
+                if config.profile != ""
                 else boto3.session.Session()
             )
 

@@ -3,23 +3,36 @@ File System Handler Configuration Module
 """
 
 from argparse import ArgumentParser
-from dataclasses import dataclass
 import os
 from util import log
 
-@dataclass
+
 class FileSystemHandlerConfig:
     """
     Dataclass to hold the FileSystemHandler Configuration
     """
 
-    path: str
-    bucket_name: str
-    timestream_db: str = ""
-    timestream_table: str = ""
-    profile: str = ""
-    concurrency_limit: int = 500
-    allow_delete: bool = False
+    def __init__(
+        self,
+        path: str,
+        bucket_name: str,
+        timestream_db: str = "",
+        timestream_table: str = "",
+        profile: str = "",
+        concurrency_limit: int = 500,
+        allow_delete: bool = False,
+    ) -> None:
+        """
+        Class Constructor
+        """
+
+        self.path = path
+        self.bucket_name = bucket_name
+        self.timestream_db = timestream_db
+        self.timestream_table = timestream_table
+        self.profile = profile
+        self.concurrency_limit = concurrency_limit
+        self.allow_delete = allow_delete
 
 
 def create_argparse() -> ArgumentParser:

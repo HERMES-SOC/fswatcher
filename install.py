@@ -30,7 +30,7 @@ try:
     with open("config.yaml", "r") as ymlfile:
         cfg = yaml.load(ymlfile)
 except:
-    print("Unable to parse config.yml")
+    print("Unable to parse config.yaml")
     sys.exit(1)
 
 # Verify awscli is installed
@@ -71,13 +71,17 @@ with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
         sys.exit(1)
 
     if cfg.get("SDC_AWS_S3_BUCKET"):
-        filedata = filedata.replace("$SDC_AWS_S3_BUCKET$", f'-b {cfg["SDC_AWS_S3_BUCKET"]}')
+        filedata = filedata.replace(
+            "$SDC_AWS_S3_BUCKET$", f'-b {cfg["SDC_AWS_S3_BUCKET"]}'
+        )
     else:
         print("SDC_AWS_S3_BUCKET is required")
         sys.exit(1)
 
     if cfg.get("SDC_AWS_WATCH_PATH"):
-        filedata = filedata.replace("$SDC_AWS_WATCH_PATH$", f'-d {cfg["SDC_AWS_WATCH_PATH"]}')
+        filedata = filedata.replace(
+            "$SDC_AWS_WATCH_PATH$", f'-d {cfg["SDC_AWS_WATCH_PATH"]}'
+        )
     else:
         print("SDC_AWS_WATCH_PATH is required")
         sys.exit(1)
@@ -88,7 +92,9 @@ with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
         filedata = filedata.replace("$SDC_AWS_PROFILE$", "")
 
     if cfg.get("SDC_AWS_TIMESTREAM_DB"):
-        filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", f'-t {cfg["SDC_AWS_TIMESTREAM_DB"]}')
+        filedata = filedata.replace(
+            "$SDC_AWS_TIMESTREAM_DB$", f'-t {cfg["SDC_AWS_TIMESTREAM_DB"]}'
+        )
     else:
         filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", "")
 
@@ -98,9 +104,11 @@ with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
         )
     else:
         filedata = filedata.replace("$SDC_AWS_TIMESTREAM_TABLE$", "")
-    
+
     if cfg.get("SDC_AWS_CONCURRENCY_LIMIT"):
-        filedata = filedata.replace("$SDC_AWS_CONCURRENCY_LIMIT$", f'-c {cfg["SDC_AWS_CONCURRENCY_LIMIT"]}')
+        filedata = filedata.replace(
+            "$SDC_AWS_CONCURRENCY_LIMIT$", f'-c {cfg["SDC_AWS_CONCURRENCY_LIMIT"]}'
+        )
     else:
         filedata = filedata.replace("$SDC_AWS_CONCURRENCY_LIMIT$", "")
 
@@ -108,7 +116,7 @@ with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
         filedata = filedata.replace("$SDC_AWS_ALLOW_DELETE$", "-a")
     else:
         filedata = filedata.replace("$SDC_AWS_ALLOW_DELETE$", "")
-    
+
 
 # Write the file out again
 with open(abs + "/sdc_aws_fswatcher.service", "w") as file:
