@@ -12,13 +12,16 @@ import botocore
 import boto3.s3.transfer as s3transfer
 from FileSystemHandlerEvent import FileSystemHandlerEvent
 from FileSystemHandlerConfig import FileSystemHandlerConfig
-from hermes_core import log
 from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
 )
 from typing import List
+from util import log
+
+# Configure Logging
+
 
 
 class FileSystemHandler(FileSystemEventHandler):

@@ -5,8 +5,7 @@ File System Handler Configuration Module
 from argparse import ArgumentParser
 from dataclasses import dataclass
 import os
-from hermes_core import log
-
+from util import log
 
 @dataclass
 class FileSystemHandlerConfig:
