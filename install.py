@@ -43,7 +43,7 @@ else:
     os.system("sudo chmod -R 755 " + os.popen("which aws").read().strip())
 
 # Verify script exists sdc_aws_fswatcher.py
-if not os.path.exists(abs + "/sdc_aws_fswatcher.py"):
+if not os.path.exists(abs + "/sdc_aws_fswatcher/sdc_aws_fswatcher.py"):
     print("sdc_aws_fswatcher.py does not exist")
     sys.exit(1)
 else:
@@ -62,17 +62,53 @@ filedata = None
 with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
     filedata = file.read()
 
-    # Replace the target string
     filedata = filedata.replace("$CURRENT_WORKING_DIRECTORY$", abs)
-    filedata = filedata.replace("$SDC_AWS_S3_BUCKET$", cfg["SDC_AWS_S3_BUCKET"])
-    filedata = filedata.replace("$SDC_AWS_WATCH_PATH$", cfg["SDC_AWS_WATCH_PATH"])
-    filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", cfg["SDC_AWS_TIMESTREAM_DB"])
-    filedata = filedata.replace(
-        "$SDC_AWS_TIMESTREAM_TABLE$", cfg["SDC_AWS_TIMESTREAM_TABLE"]
-    )
-    # TODO: Add support for profiles and MFA
-    # filedata = filedata.replace('$SDC_AWS_PROFILE$', cfg['SDC_AWS_PROFILE'])
-    filedata = filedata.replace("$SDC_SYSTEM_USER$", cfg["SDC_SYSTEM_USER"])
+
+    if cfg.get("SDC_SYSTEM_USER"):
+        filedata = filedata.replace("$SDC_SYSTEM_USER$", cfg["SDC_SYSTEM_USER"])
+    else:
+        print("SDC_SYSTEM_USER is required")
+        sys.exit(1)
+
+    if cfg.get("SDC_AWS_S3_BUCKET"):
+        filedata = filedata.replace("$SDC_AWS_S3_BUCKET$", f'-b {cfg["SDC_AWS_S3_BUCKET"]}')
+    else:
+        print("SDC_AWS_S3_BUCKET is required")
+        sys.exit(1)
+
+    if cfg.get("SDC_AWS_WATCH_PATH"):
+        filedata = filedata.replace("$SDC_AWS_WATCH_PATH$", f'-d {cfg["SDC_AWS_WATCH_PATH"]}')
+    else:
+        print("SDC_AWS_WATCH_PATH is required")
+        sys.exit(1)
+
+    if cfg.get("SDC_AWS_PROFILE"):
+        filedata = filedata.replace("$SDC_AWS_PROFILE$", f'-p {cfg["SDC_AWS_PROFILE"]}')
+    else:
+        filedata = filedata.replace("$SDC_AWS_PROFILE$", "")
+
+    if cfg.get("SDC_AWS_TIMESTREAM_DB"):
+        filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", f'-t {cfg["SDC_AWS_TIMESTREAM_DB"]}')
+    else:
+        filedata = filedata.replace("$SDC_AWS_TIMESTREAM_DB$", "")
+
+    if cfg.get("SDC_AWS_TIMESTREAM_TABLE"):
+        filedata = filedata.replace(
+            "$SDC_AWS_TIMESTREAM_TABLE$", f'-tt {cfg["SDC_AWS_TIMESTREAM_TABLE"]}'
+        )
+    else:
+        filedata = filedata.replace("$SDC_AWS_TIMESTREAM_TABLE$", "")
+    
+    if cfg.get("SDC_AWS_CONCURRENCY_LIMIT"):
+        filedata = filedata.replace("$SDC_AWS_CONCURRENCY_LIMIT$", f'-c {cfg["SDC_AWS_CONCURRENCY_LIMIT"]}')
+    else:
+        filedata = filedata.replace("$SDC_AWS_CONCURRENCY_LIMIT$", "")
+
+    if "SDC_AWS_ALLOW_DELETE" in cfg and cfg["SDC_AWS_ALLOW_DELETE"] == "True":
+        filedata = filedata.replace("$SDC_AWS_ALLOW_DELETE$", "-a")
+    else:
+        filedata = filedata.replace("$SDC_AWS_ALLOW_DELETE$", "")
+    
 
 # Write the file out again
 with open(abs + "/sdc_aws_fswatcher.service", "w") as file:
