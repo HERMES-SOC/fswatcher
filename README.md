@@ -20,6 +20,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 - AWS CLI
 - AWS SDC External Server
 - AWS S3 Bucket
+- Conda environment (optional)
 - AWS Timestream Table (optional)
 
 ### Setup
