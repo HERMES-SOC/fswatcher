@@ -4,7 +4,7 @@ File System Handler Configuration Module
 
 from argparse import ArgumentParser
 import os
-from util import log
+from sdc_aws_fswatcher import log
 
 
 class FileSystemHandlerConfig:
@@ -19,7 +19,7 @@ class FileSystemHandlerConfig:
         timestream_db: str = "",
         timestream_table: str = "",
         profile: str = "",
-        concurrency_limit: int = 500,
+        concurrency_limit: int = 20,
         allow_delete: bool = False,
     ) -> None:
         """

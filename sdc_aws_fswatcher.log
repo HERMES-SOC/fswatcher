@@ -1,0 +1,50 @@
+2022-12-21 20:53:18,502 - sdc_aws_fswatcher.util - ERROR - Invalid configuration, please provide a directory path and S3 bucket name
+2022-12-21 20:55:35,697 - sdc_aws_fswatcher.util - ERROR - Invalid configuration, please provide a directory path and S3 bucket name
+2022-12-21 21:07:41,179 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:43,919 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:46,664 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:49,348 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:52,150 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:54,908 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:07:57,599 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:00,420 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:03,115 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:05,863 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:08,664 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:11,328 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:13,881 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:16,622 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:19,412 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:21,568 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:24,388 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:27,132 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:29,863 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:32,640 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:35,399 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:38,143 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:40,868 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:43,659 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:46,381 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:49,168 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:51,862 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:54,621 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:08:57,431 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:00,168 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:02,839 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:05,631 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:08,409 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:11,118 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:13,839 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': 'Path (/home/dbarrous/sdc_aws_fswatcher/test_directory) does not exist'}
+2022-12-21 21:09:16,541 - sdc_aws_fswatcher - INFO - Watching for file events in: /home/dbarrous/dbarrous/testdir
+2022-12-21 21:09:29,089 - sdc_aws_fswatcher - INFO - Object (/o) - File Create: /o
+2022-12-21 21:09:29,089 - sdc_aws_fswatcher - INFO - Object (/o) - Generating S3 Object Tags
+2022-12-21 21:09:29,090 - sdc_aws_fswatcher - INFO - Object (/o) - Stats: {'st_atime': 1671674969.0819333, 'st_ctime': 1671674969.0819333, 'st_gid': 1000, 'st_ino': 7750990, 'st_mode': 33184, 'st_mtime': 1671674969.0819333, 'st_size': 0, 'st_uid': 1000}
+2022-12-21 21:09:29,090 - sdc_aws_fswatcher - INFO - Object (/o) - Uploading file to S3 Bucket (damian-sam)
+2022-12-21 21:09:29,090 - sdc_aws_fswatcher - ERROR - 'FileSystemHandler' object has no attribute 's3t'
+2022-12-21 21:09:29,091 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': "Error handling file skipping to next: 'FileSystemHandler' object has no attribute 's3t'"}
+2022-12-21 21:09:29,091 - sdc_aws_fswatcher - INFO - Object (/o) - File Update: /o
+2022-12-21 21:09:29,091 - sdc_aws_fswatcher - INFO - Object (/o) - Generating S3 Object Tags
+2022-12-21 21:09:29,091 - sdc_aws_fswatcher - INFO - Object (/o) - Stats: {'st_atime': 1671674969.0819333, 'st_ctime': 1671674969.0819333, 'st_gid': 1000, 'st_ino': 7750990, 'st_mode': 33184, 'st_mtime': 1671674969.0819333, 'st_size': 0, 'st_uid': 1000}
+2022-12-21 21:09:29,092 - sdc_aws_fswatcher - INFO - Object (/o) - Uploading file to S3 Bucket (damian-sam)
+2022-12-21 21:09:29,092 - sdc_aws_fswatcher - ERROR - 'FileSystemHandler' object has no attribute 's3t'
+2022-12-21 21:09:29,092 - sdc_aws_fswatcher - ERROR - {'status': 'ERROR', 'message': "Error handling file skipping to next: 'FileSystemHandler' object has no attribute 's3t'"}

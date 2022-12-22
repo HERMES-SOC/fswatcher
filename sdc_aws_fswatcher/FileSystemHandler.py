@@ -10,15 +10,15 @@ from urllib import parse
 import boto3
 import botocore
 import boto3.s3.transfer as s3transfer
-from FileSystemHandlerEvent import FileSystemHandlerEvent
-from FileSystemHandlerConfig import FileSystemHandlerConfig
+from sdc_aws_fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
+from sdc_aws_fswatcher.FileSystemHandlerConfig import FileSystemHandlerConfig
 from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
 )
 from typing import List
-from util import log
+from sdc_aws_fswatcher import log
 
 # Configure Logging
 
@@ -122,7 +122,7 @@ class FileSystemHandler(FileSystemEventHandler):
         # Handle the event
         self._handle_event(filtered_event)
 
-    def _filter_event(self, event: FileSystemEvent) -> FileSystemHandlerEvent:
+    def _filter_event(self, event: FileSystemEvent) -> FileSystemHandlerEvent or None:
         """
         Function to filter events
         """

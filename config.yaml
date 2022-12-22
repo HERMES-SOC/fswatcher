@@ -5,7 +5,7 @@ SDC_SYSTEM_USER: "dbarrous"
 # S3 Bucket name to store the data
 SDC_AWS_S3_BUCKET: "damian-sam"
 # Absolute path to watch for new files
-SDC_AWS_WATCH_PATH: "/home/dbarrous/sdc_aws_fswatcher/test_directory"
+SDC_AWS_WATCH_PATH: "/home/dbarrous/dbarrous/testdir"
 
 # # Timestream database name (Optional)
 # SDC_AWS_TIMESTREAM_DB: "sdc_aws_fswatcher"

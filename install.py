@@ -16,12 +16,18 @@ print("Absolute path: " + abs)
 # Create venv if it does not exist
 if not os.path.exists(abs + "/venv"):
     print("Creating venv")
-    os.system("python3 -m venv " + abs + "/venv")
+    os.system("python -m venv " + abs + "/venv")
     print("Created venv")
+
+# Absolute path to venv
+
 
 # Install requirements
 print("Installing requirements")
-os.system(abs + "/venv/bin/pip install -r requirements.txt")
+os.system("cd ..")
+os.system(f"{abs}/venv/bin/pip install {abs}/../sdc_aws_fswatcher/")
+os.system("cd sdc_aws_fswatcher")
+
 print("Installed requirements")
 
 yaml = __import__("yaml")
@@ -43,7 +49,7 @@ else:
     os.system("sudo chmod -R 755 " + os.popen("which aws").read().strip())
 
 # Verify script exists sdc_aws_fswatcher.py
-if not os.path.exists(abs + "/sdc_aws_fswatcher/sdc_aws_fswatcher.py"):
+if not os.path.exists(abs + "/sdc_aws_fswatcher/__main__.py"):
     print("sdc_aws_fswatcher.py does not exist")
     sys.exit(1)
 else:
