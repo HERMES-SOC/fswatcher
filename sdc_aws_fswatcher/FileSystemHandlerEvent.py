@@ -125,5 +125,9 @@ class FileSystemHandlerEvent:
         parsed_src_path = path.split(self.watch_path, 1)
 
         merged_path = "".join(parsed_src_path)
+        
+        # Strip the first slash from the path
+        if merged_path[0] == "/":
+            merged_path = merged_path[1:]
 
         return merged_path
