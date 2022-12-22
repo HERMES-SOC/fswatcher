@@ -41,17 +41,19 @@ This is a filewatcher system that can be configured to watch a directory for new
 
     * `SDC_SYSTEM_USER` is the user that will be used to run the script. It must have access keys set up to the `SDC_AWS_S3_BUCKET`, `SDC_AWS_TIMESTREAM_DB` and `SDC_AWS_TIMESTREAM_TABLE` without MFA.
 
-    * `SDC_AWS_S3_BUCKET` is the S3 bucket that will be used to store the files.
+    * `SDC_AWS_S3_BUCKET` is the S3 bucket that will be used to store the files. (**Required**)
 
-    * `SDC_AWS_WATCH_PATH` is the directory that will be watched for new files.
+    * `SDC_AWS_WATCH_PATH` is the directory that will be watched for new files. (**Required**)
 
-    * `SDC_AWS_TIMESTREAM_DB` is the Timestream database that will be used to store the logs.
+    * `SDC_AWS_TIMESTREAM_DB` is the Timestream database that will be used to store the logs. (*Optional*)
 
-    * `SDC_AWS_TIMESTREAM_TABLE` is the Timestream table that will be used to store the logs.
+    * `SDC_AWS_TIMESTREAM_TABLE` is the Timestream table that will be used to store the logs. (*Optional*)
     
+    * `SDC_AWS_PROFILE` is the AWS Profile to use for authentication. (*Optional*)
 
+    * `SDC_AWS_CONCURRENCY_LIMIT` is the Concurrent uploads limit to S3. (*Optional*)
 
-    Note: The `SDC_AWS_WATCH_PATH` must be a directory that exists on the SDC External Server. The `SDC_AWS_S3_BUCKET`, `SDC_AWS_TIMESTREAM_DB` and `SDC_AWS_TIMESTREAM_TABLE` must exist on the AWS account.
+    * `SDC_AWS_ALLOW_DELETE` is a flag to Delete files from S3 if they are deleted from the watch directory. (*Optional*)
 
 5. Run the install script
 
