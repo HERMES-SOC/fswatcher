@@ -1,9 +1,9 @@
-# SDC AWS FSWatcher
+# FSWatcher Utility
 
 This is a filewatcher system that can be configured to watch a directory for new files and then upload them to an S3 bucket. It also tags the objects with the creation and modified time, to keep that information on the cloud as well. This is useful for keeping a backup of files on the cloud, or for keeping a copy of files that are being created on a local machine. You also can configure the system to log the `CREATE`, `UPDATE`, `PUT` and `DELETE` events to a Timestream table, so you can keep track of the files that are being created, modified or deleted in near realtime. This will allow for extra visibility of the AWS SDC Pipeline from the SDC External Server to the S3 Bucket.
 
 ## Table of Contents
-- [SDC AWS FSWatcher](#sdc-aws-fswatcher)
+- [FSWatcher](#fswatcher)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
     - [Requirements](#requirements)
@@ -26,7 +26,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 ### Setup
 1. Clone the repository
 
-    ```git clone git@github.com:dbarrous/fswatcher.git```
+    ```git clone git@github.com:HERMES-SOC/fswatcher.git```
 
 2. Install the requirements
 
@@ -60,13 +60,13 @@ This is a filewatcher system that can be configured to watch a directory for new
 
     ```sudo python install.py```
 
-    Note: This will create a service called `sdc-aws-fswatcher` that will run the `fswatcher.py` script on boot.
+    Note: This will create a service called `fswatcher` that will run the `fswatcher.py` script on boot.
 
 6. Verify the service is running
 
-    ```sudo systemctl status sdc-aws-fswatcher.service```
+    ```sudo systemctl status fswatcher.service```
 
-    Note: If the service is not running/errored out, you can check the logs with `sudo journalctl -u sdc-aws-fswatcher.service -n 100`
+    Note: If the service is not running/errored out, you can check the logs with `sudo journalctl -u fswatcher.service -n 100`
 
 
 ## Usage
@@ -107,7 +107,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 ## Logs
 There are two ways to view the logs of the filewatcher system. You can view the logs in the directory which contains the script within the `hermes.log` file.
 
-Or since it is installed as a service you can view the logs with `sudo journalctl -u sdc-aws-fswatcher.service -n 100` or by viewing the logs in the `/var/log/sdc-aws-fswatcher.log` file.
+Or since it is installed as a service you can view the logs with `sudo journalctl -u fswatcher.service -n 100` or by viewing the logs in the `/var/log/fswatcher.log` file.
 
 ## Uninstall
 
@@ -117,7 +117,7 @@ Or since it is installed as a service you can view the logs with `sudo journalct
 
 2. Verify the service is not running
 
-    ```sudo systemctl status sdc-aws-fswatcher.service```
+    ```sudo systemctl status fswatcher.service```
 
     Note: If the service is running/errored out, you can check the logs with `sudo journalctl -u sdc-aws-fswatcher.service -n 100`
 
