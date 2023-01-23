@@ -4,8 +4,8 @@ Main File for the AWS File System Watcher
 
 import time
 from watchdog.observers import Observer
-from sdc_aws_fswatcher.FileSystemHandler import FileSystemHandler
-from sdc_aws_fswatcher.FileSystemHandlerConfig import get_config
+from fswatcher.FileSystemHandler import FileSystemHandler
+from fswatcher.FileSystemHandlerConfig import get_config
 
 
 # Main Function

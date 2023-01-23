@@ -1,6 +1,6 @@
-hermes.log
+fswatcher.log
 test_directory/*
-sdc_aws_fswatcher.service
+fswatcher.service
 venv/
 ```
 *.egg-info/

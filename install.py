@@ -1,5 +1,5 @@
 """
-Installation script to install the sdc_aws_fswatcher service
+Installation script to install the fswatcher service
 """
 
 import os
@@ -25,8 +25,8 @@ if not os.path.exists(abs + "/venv"):
 # Install requirements
 print("Installing requirements")
 os.system("cd ..")
-os.system(f"{abs}/venv/bin/pip install {abs}/../sdc_aws_fswatcher/")
-os.system("cd sdc_aws_fswatcher")
+os.system(f"{abs}/venv/bin/pip install {abs}/../fswatcher/")
+os.system("cd fswatcher")
 
 print("Installed requirements")
 
@@ -48,24 +48,24 @@ else:
     # Change permissions on awscli using which aws
     os.system("sudo chmod -R 755 " + os.popen("which aws").read().strip())
 
-# Verify script exists sdc_aws_fswatcher.py
-if not os.path.exists(abs + "/sdc_aws_fswatcher/__main__.py"):
-    print("sdc_aws_fswatcher.py does not exist")
+# Verify script exists fswatcher.py
+if not os.path.exists(abs + "/fswatcher/__main__.py"):
+    print("fswatcher.py does not exist")
     sys.exit(1)
 else:
-    print("sdc_aws_fswatcher.py exists")
+    print("fswatcher.py exists")
 
 # Verify service file exists
-if not os.path.exists(abs + "/sdc_aws_fswatcher_template.service"):
-    print("sdc_aws_fswatcher_template.service does not exist")
+if not os.path.exists(abs + "/fswatcher_template.service"):
+    print("fswatcher_template.service does not exist")
     sys.exit(1)
 else:
-    print("sdc_aws_fswatcher_template.service exists")
+    print("fswatcher_template.service exists")
 
 
 # Change variables in service file
 filedata = None
-with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
+with open(abs + "/fswatcher_template.service", "r") as file:
     filedata = file.read()
 
     filedata = filedata.replace("$CURRENT_WORKING_DIRECTORY$", abs)
@@ -125,29 +125,29 @@ with open(abs + "/sdc_aws_fswatcher_template.service", "r") as file:
 
 
 # Write the file out again
-with open(abs + "/sdc_aws_fswatcher.service", "w") as file:
+with open(abs + "/fswatcher.service", "w") as file:
     file.write(filedata)
 
 # Check if service already exists and remove it
-if os.path.exists("/etc/systemd/system/sdc_aws_fswatcher.service"):
+if os.path.exists("/etc/systemd/system/fswatcher.service"):
     print("Service already exists - Updating service")
-    os.system("sudo systemctl stop sdc_aws_fswatcher.service")
-    os.system("sudo systemctl disable sdc_aws_fswatcher.service")
-    os.system("sudo rm /etc/systemd/system/sdc_aws_fswatcher.service")
+    os.system("sudo systemctl stop fswatcher.service")
+    os.system("sudo systemctl disable fswatcher.service")
+    os.system("sudo rm /etc/systemd/system/fswatcher.service")
     print("Removed existing service")
 
 # Copy service file to /etc/systemd/system
-os.system("sudo cp " + abs + "/sdc_aws_fswatcher.service /etc/systemd/system/")
+os.system("sudo cp " + abs + "/fswatcher.service /etc/systemd/system/")
 print("Copied service file to /etc/systemd/system")
 
 # Enable service
-os.system("sudo systemctl enable sdc_aws_fswatcher.service")
+os.system("sudo systemctl enable fswatcher.service")
 print("Enabled service")
 
 # Start service
-os.system("sudo systemctl start sdc_aws_fswatcher.service")
+os.system("sudo systemctl start fswatcher.service")
 print("Started service")
 
 # Verify service is running
-os.system("sudo systemctl status sdc_aws_fswatcher.service")
+os.system("sudo systemctl status fswatcher.service")
 print("Service status")

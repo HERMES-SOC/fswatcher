@@ -8,7 +8,7 @@ SDC_AWS_S3_BUCKET: "damian-sam"
 SDC_AWS_WATCH_PATH: "/home/dbarrous/dbarrous/testdir"
 
 # # Timestream database name (Optional)
-# SDC_AWS_TIMESTREAM_DB: "sdc_aws_fswatcher"
+# SDC_AWS_TIMESTREAM_DB: "fswatcher"
 
 # # Timestream table name (Optional)
 # SDC_AWS_TIMESTREAM_TABLE: "logs"

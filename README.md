@@ -26,7 +26,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 ### Setup
 1. Clone the repository
 
-    ```git clone git@github.com:dbarrous/sdc_aws_fswatcher.git```
+    ```git clone git@github.com:dbarrous/fswatcher.git```
 
 2. Install the requirements
 
@@ -60,7 +60,7 @@ This is a filewatcher system that can be configured to watch a directory for new
 
     ```sudo python install.py```
 
-    Note: This will create a service called `sdc-aws-fswatcher` that will run the `sdc_aws_fswatcher.py` script on boot.
+    Note: This will create a service called `sdc-aws-fswatcher` that will run the `fswatcher.py` script on boot.
 
 6. Verify the service is running
 

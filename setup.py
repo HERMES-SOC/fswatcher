@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="sdc_aws_fswatcher",
+    name="fswatcher",
     version="0.1.0",
     description="AWS File System Watcher",
     author="Damian Barrous-Dume",
-    packages=["sdc_aws_fswatcher"],
+    packages=["fswatcher"],
     include_package_data=True,
     install_requires=[
         "watchdog",
@@ -15,7 +15,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "sdc_aws_fswatcher = sdc_aws_fswatcher.sdc_aws_fswatcher:main",
+            "fswatcher = fswatcher.fswatcher:main",
         ]
     },
 )
