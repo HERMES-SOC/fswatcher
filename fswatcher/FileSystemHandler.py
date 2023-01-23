@@ -10,15 +10,15 @@ from urllib import parse
 import boto3
 import botocore
 import boto3.s3.transfer as s3transfer
-from sdc_aws_fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
-from sdc_aws_fswatcher.FileSystemHandlerConfig import FileSystemHandlerConfig
+from fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
+from fswatcher.FileSystemHandlerConfig import FileSystemHandlerConfig
 from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
 )
 from typing import List
-from sdc_aws_fswatcher import log
+from fswatcher import log
 
 # Configure Logging
 

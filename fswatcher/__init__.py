@@ -1,5 +1,5 @@
 """
-Utility functions for sdc_aws_fswatcher.
+Utility functions for fswatcher.
 """
 
 import logging
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 # Create log file handler
-file_handler = logging.FileHandler("sdc_aws_fswatcher.log")
+file_handler = logging.FileHandler("fswatcher.log")
 file_handler.setLevel(logging.INFO)
 
 # Log to file and console
