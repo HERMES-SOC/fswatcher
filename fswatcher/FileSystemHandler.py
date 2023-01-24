@@ -20,9 +20,6 @@ from watchdog.events import (
 from typing import List
 from fswatcher import log
 
-# Configure Logging
-
-
 class FileSystemHandler(FileSystemEventHandler):
     """
     Subclass to handle file system events
@@ -47,16 +44,10 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Initialize Boto3 Session
             self.boto3_session = (
-                boto3.session.Session(profile_name=config.profile)
+                boto3.session.Session(profile_name=config.profile, region_name=os.getenv("AWS_REGION"))
                 if config.profile != ""
-                else boto3.session.Session()
+                else boto3.session.Session(region_name=os.getenv("AWS_REGION"))
             )
-
-            # Initialize S3 Client
-            s3 = self.boto3_session.resource("s3")
-
-            # Check if bucket exists
-            s3.meta.client.head_bucket(Bucket=config.bucket_name)
 
             # Initialize S3 Transfer Manager with concurrency limit
             botocore_config = botocore.config.Config(

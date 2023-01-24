@@ -28,6 +28,8 @@ There are a multitude of configurable variables that can be set in the `config.j
 
 * `SDC_AWS_TIMESTREAM_TABLE` is the Timestream table that will be used to store the logs. (*Optional*)
 
+* `SDC_AWS_TIMESTREAM_TABLE` is the Region the timestream db is located in. (*Required if above two are added*)
+
 * `SDC_AWS_PROFILE` is the AWS Profile to use for authentication. (*Optional*)
 
 * `SDC_AWS_CONCURRENCY_LIMIT` is the Concurrent uploads limit to S3. (*Optional*)
@@ -122,6 +124,7 @@ There are a multitude of configurable variables that can be set in the `config.j
     -e SDC_AWS_S3_BUCKET='-b <SDC_AWS_S3_BUCKET>' \
     -e SDC_AWS_TIMESTREAM_DB='-t <SDC_AWS_TIMESTREAM_DB>' \
     -e SDC_AWS_TIMESTREAM_TABLE='-tt <SDC_AWS_TIMESTREAM_TABLE>' \
+    -e AWS_REGION='<SDC_AWS_TIMESTREAM_REGION>' \
     -e SDC_AWS_PROFILE='-p <SDC_AWS_PROFILE>' \
     -e SDC_AWS_CONCURRENCY_LIMIT='-c <SDC_AWS_CONCURRENCY_LIMIT>' \
     -e SDC_AWS_ALLOW_DELETE='-a <SDC_AWS_ALLOW_DELETE>' \
