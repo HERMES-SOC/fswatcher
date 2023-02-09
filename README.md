@@ -120,7 +120,7 @@ There are a multitude of configurable variables that can be set in the `config.j
 2. Run the docker image replacing the environment variables with your values and mounting the `SDC_AWS_WATCH_PATH` directory. The variable names match up with the ones found in configurable variables above. The only things that are required are the `SDC_AWS_S3_BUCKET` and `SDC_AWS_WATCH_PATH` variables. The rest are optional, and you can remove the line you don't want to use in the docker run command.
 
     ```bash
-    docker run -d \
+    docker run -d --restart=always \
     -e SDC_AWS_S3_BUCKET='-b <SDC_AWS_S3_BUCKET>' \
     -e SDC_AWS_TIMESTREAM_DB='-t <SDC_AWS_TIMESTREAM_DB>' \
     -e SDC_AWS_TIMESTREAM_TABLE='-tt <SDC_AWS_TIMESTREAM_TABLE>' \
@@ -128,6 +128,8 @@ There are a multitude of configurable variables that can be set in the `config.j
     -e SDC_AWS_PROFILE='-p <SDC_AWS_PROFILE>' \
     -e SDC_AWS_CONCURRENCY_LIMIT='-c <SDC_AWS_CONCURRENCY_LIMIT>' \
     -e SDC_AWS_ALLOW_DELETE='-a <SDC_AWS_ALLOW_DELETE>' \
+    -e SDC_AWS_SLACK_TOKEN='-s ' \
+    -e SDC_AWS_SLACK_CHANNEL='-sc ' \
     -v /etc/passwd:/etc/passwd \
     -v <SDC_AWS_WATCH_PATH>:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
