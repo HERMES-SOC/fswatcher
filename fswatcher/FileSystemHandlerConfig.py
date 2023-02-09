@@ -98,7 +98,6 @@ def create_argparse() -> ArgumentParser:
         help="Channel for Slack to send notifications",
     )
 
-
     # Return the Argument Parser
     return parser
 

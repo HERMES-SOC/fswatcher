@@ -171,7 +171,17 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Send Slack Notification about the event
             if self.slack_client is not None:
-                slack_message = f'FSWatcher: New file in watch directory - ({event.get_parsed_path()}) :file_folder:'
+                if event.action_type == "CREATE":
+                    slack_message = f"FSWatcher: New file in watch directory - ({event.get_parsed_path()}) :file_folder:"
+                elif event.action_type == "UPDATE":
+                    slack_message = f"FSWatcher: File modified in watch directory - ({event.get_parsed_path()}) :file_folder:"
+                elif event.action_type == "PUT":
+                    slack_message = f"FSWatcher: File moved in watch directory - ({event.get_parsed_path()}) :file_folder:"
+                elif event.action_type == "DELETE":
+                    slack_message = f"FSWatcher: File deleted from watch directory - ({event.get_parsed_path()}) :file_folder:"
+                else:
+                    slack_message = f"FSWatcher: Unknown file event in watch directory - ({event.get_parsed_path()}) :file_folder:"
+
                 self._send_slack_notification(
                     slack_client=self.slack_client,
                     slack_channel=self.slack_channel,
@@ -200,7 +210,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
                 # Send Slack Notification about the event
                 if self.slack_client is not None:
-                    slack_message = f'FSWatcher: File successfully uploaded to {event.bucket_name} - ({event.get_parsed_path()}) :file_folder:'
+                    slack_message = f"FSWatcher: File successfully uploaded to {event.bucket_name} - ({event.get_parsed_path()}) :file_folder:"
                     self._send_slack_notification(
                         slack_client=self.slack_client,
                         slack_channel=self.slack_channel,
@@ -304,6 +314,12 @@ class FileSystemHandler(FileSystemEventHandler):
             log.error(
                 {"status": "ERROR", "message": f"Error uploading to S3 Bucket: {e}"}
             )
+            self._send_slack_notification(
+                slack_client=self.slack_client,
+                slack_channel=self.slack_channel,
+                slack_message=f"FSWatcher: Error uploading file to {bucket_name} - ({file_key}) :file_folder:",
+                alert_type="error",
+            )
 
     def _delete_from_s3_bucket(self, bucket_name, file_key):
         """
@@ -325,19 +341,46 @@ class FileSystemHandler(FileSystemEventHandler):
             log.error(
                 {"status": "ERROR", "message": f"Error deleting from S3 Bucket: {e}"}
             )
+            self._send_slack_notification(
+                slack_client=self.slack_client,
+                slack_channel=self.slack_channel,
+                slack_message=f"FSWatcher: Error deleting file from {bucket_name} - ({file_key}) :file_folder:",
+                alert_type="error",
+            )
 
     @staticmethod
     def _send_slack_notification(
         slack_client,
         slack_channel: str,
         slack_message: str,
+        alert_type: str = "success",
     ) -> None:
         """
         Function to send a Slack Notification
         """
         log.info(f"Sending Slack Notification to {slack_channel}")
         try:
-            slack_client.chat_postMessage(channel=slack_channel, text=slack_message)
+            color = {
+                "success": "#36a64f",
+                "error": "#ff0000",
+            }
+            slack_client.chat_postMessage(
+                channel=slack_channel,
+                attachments=[
+                    {
+                        "color": color[alert_type],
+                        "blocks": [
+                            {
+                                "type": "section",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": f"{slack_message}",
+                                },
+                            }
+                        ],
+                    }
+                ],
+            )
 
         except SlackApiError as e:
             log.error(
