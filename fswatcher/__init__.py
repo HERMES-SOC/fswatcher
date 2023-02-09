@@ -20,3 +20,7 @@ file_handler.setFormatter(formatter)
 
 # Add the handlers to the logger
 log.addHandler(file_handler)
+
+# Configure boto3 logging to debug
+boto3_log = logging.getLogger("boto3")
+boto3_log.setLevel(logging.DEBUG)

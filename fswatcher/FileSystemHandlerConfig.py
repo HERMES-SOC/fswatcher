@@ -21,6 +21,9 @@ class FileSystemHandlerConfig:
         profile: str = "",
         concurrency_limit: int = 20,
         allow_delete: bool = False,
+        slack_token: str = "",
+        slack_channel: str = "",
+        slack_message: str = "",
     ) -> None:
         """
         Class Constructor
@@ -33,6 +36,9 @@ class FileSystemHandlerConfig:
         self.profile = profile
         self.concurrency_limit = concurrency_limit
         self.allow_delete = allow_delete
+        self.slack_token = slack_token
+        self.slack_channel = slack_channel
+        self.slack_message = slack_message
 
 
 def create_argparse() -> ArgumentParser:
@@ -78,6 +84,27 @@ def create_argparse() -> ArgumentParser:
         help="Allow Delete Flag for the File System Watcher",
     )
 
+    # Add Argument to parse slack token
+    parser.add_argument(
+        "-s",
+        "--slack_token",
+        help="Token for Slack to send notifications",
+    )
+
+    # Add Argument to parse slack channel
+    parser.add_argument(
+        "-sc",
+        "--slack_channel",
+        help="Channel for Slack to send notifications",
+    )
+
+    # Add Argument to parse slack message
+    parser.add_argument(
+        "-sm",
+        "--slack_message",
+        help="Message for Slack to send notifications",
+    )
+
     # Return the Argument Parser
     return parser
 
@@ -105,6 +132,9 @@ def get_args(args: ArgumentParser) -> dict:
     args_dict["SDC_AWS_PROFILE"] = args.profile
     args_dict["SDC_AWS_CONCURRENCY_LIMIT"] = args.concurrency_limit_limit
     args_dict["SDC_AWS_ALLOW_DELETE"] = args.allow_delete
+    args_dict["SDC_AWS_SLACK_TOKEN"] = args.slack_token
+    args_dict["SDC_AWS_SLACK_CHANNEL"] = args.slack_channel
+    args_dict["SDC_AWS_SLACK_MESSAGE"] = args.slack_message
 
     # Return the arguments dictionary
     return args_dict
@@ -167,6 +197,9 @@ def get_config() -> FileSystemHandlerConfig:
             profile=args.get("SDC_AWS_PROFILE"),
             concurrency_limit=args.get("SDC_AWS_CONCURRENCY_LIMIT"),
             allow_delete=args.get("SDC_AWS_ALLOW_DELETE"),
+            slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
+            slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
+            slack_message=args.get("SDC_AWS_SLACK_MESSAGE"),
         )
 
     # Check if the environment variables are valid
@@ -179,7 +212,11 @@ def get_config() -> FileSystemHandlerConfig:
             profile=env_vars.get("SDC_AWS_PROFILE"),
             concurrency_limit=env_vars.get("SDC_AWS_CONCURRENCY_LIMIT"),
             allow_delete=env_vars.get("SDC_AWS_ALLOW_DELETE"),
+            slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
+            slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
+            slack_message=args.get("SDC_AWS_SLACK_MESSAGE"),
         )
+
     # If neither are valid, exit the program
     else:
         log.error(

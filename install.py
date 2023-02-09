@@ -46,7 +46,7 @@ if os.system("which aws") != 0:
 else:
     print("awscli is installed")
     # Change permissions on awscli using which aws
-    os.system("sudo chmod -R 755 " + os.popen("which aws").read().strip())
+    os.system("chmod -R 755 " + os.popen("which aws").read().strip())
 
 # Verify script exists fswatcher.py
 if not os.path.exists(abs + "/fswatcher/__main__.py"):
@@ -131,23 +131,23 @@ with open(abs + "/fswatcher.service", "w") as file:
 # Check if service already exists and remove it
 if os.path.exists("/etc/systemd/system/fswatcher.service"):
     print("Service already exists - Updating service")
-    os.system("sudo systemctl stop fswatcher.service")
-    os.system("sudo systemctl disable fswatcher.service")
-    os.system("sudo rm /etc/systemd/system/fswatcher.service")
+    os.system("systemctl stop fswatcher.service")
+    os.system("systemctl disable fswatcher.service")
+    os.system("rm /etc/systemd/system/fswatcher.service")
     print("Removed existing service")
 
 # Copy service file to /etc/systemd/system
-os.system("sudo cp " + abs + "/fswatcher.service /etc/systemd/system/")
+os.system("cp " + abs + "/fswatcher.service /etc/systemd/system/")
 print("Copied service file to /etc/systemd/system")
 
 # Enable service
-os.system("sudo systemctl enable fswatcher.service")
+os.system("systemctl enable fswatcher.service")
 print("Enabled service")
 
 # Start service
-os.system("sudo systemctl start fswatcher.service")
+os.system("systemctl start fswatcher.service")
 print("Started service")
 
 # Verify service is running
-os.system("sudo systemctl status fswatcher.service")
+os.system("systemctl status fswatcher.service")
 print("Service status")

@@ -8,11 +8,7 @@ setup(
     author="Damian Barrous-Dume",
     packages=["fswatcher"],
     include_package_data=True,
-    install_requires=[
-        "watchdog",
-        "boto3",
-        "pyyaml",
-    ],
+    install_requires=["watchdog", "boto3", "pyyaml", "slack_sdk"],
     entry_points={
         "console_scripts": [
             "fswatcher = fswatcher.fswatcher:main",

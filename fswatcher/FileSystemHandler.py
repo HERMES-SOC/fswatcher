@@ -4,12 +4,13 @@ File System Handler Module for SDC AWS File System Watcher
 
 import sys
 import os
-import time
 from datetime import datetime
 from urllib import parse
 import boto3
 import botocore
 import boto3.s3.transfer as s3transfer
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 from fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
 from fswatcher.FileSystemHandlerConfig import FileSystemHandlerConfig
 from watchdog.events import (
@@ -19,6 +20,7 @@ from watchdog.events import (
 )
 from typing import List
 from fswatcher import log
+
 
 class FileSystemHandler(FileSystemEventHandler):
     """
@@ -44,7 +46,9 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Initialize Boto3 Session
             self.boto3_session = (
-                boto3.session.Session(profile_name=config.profile, region_name=os.getenv("AWS_REGION"))
+                boto3.session.Session(
+                    profile_name=config.profile, region_name=os.getenv("AWS_REGION")
+                )
                 if config.profile != ""
                 else boto3.session.Session(region_name=os.getenv("AWS_REGION"))
             )
@@ -82,6 +86,27 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Initialize the timestream table
         self.timestream_table = config.timestream_table
+
+        # Initialize the slack client
+        try:
+            # Initialize the slack client
+            self.slack_client = WebClient(token=config.slack_token)
+
+            # Initialize the slack channel
+            self.slack_channel = config.slack_channel
+
+            # Initialize the slack message
+            self.slack_message = config.slack_message
+
+        except SlackApiError as e:
+            error_code = int(e.response["Error"]["Code"])
+            if error_code == 404:
+                log.error(
+                    {
+                        "status": "ERROR",
+                        "message": f"Slack Token ({config.slack_token}) is invalid",
+                    }
+                )
 
         # Validate the path
         if not os.path.exists(config.path):
@@ -147,6 +172,19 @@ class FileSystemHandler(FileSystemEventHandler):
         Function to handle file events and upload to S3
         """
         try:
+            # Send Slack Notification about the event
+            if self.slack_client is not None:
+                # Replace the filename in the slack message
+                self.slack_message = self.slack_message.replace(
+                    "$FILENAME$", event.get_parsed_path()
+                )
+
+                self._send_slack_notification(
+                    slack_client=self.slack_client,
+                    slack_channel=self.slack_channel,
+                    slack_message=self.slack_message + event.get_parsed_path(),
+                )
+
             # Get the log message
             log_message = event.get_log_message()
 
@@ -284,6 +322,24 @@ class FileSystemHandler(FileSystemEventHandler):
         except botocore.exceptions.ClientError as e:
             log.error(
                 {"status": "ERROR", "message": f"Error deleting from S3 Bucket: {e}"}
+            )
+
+    @staticmethod
+    def _send_slack_notification(
+        slack_client,
+        slack_channel: str,
+        slack_message: str,
+    ) -> None:
+        """
+        Function to send a Slack Notification
+        """
+        log.info(f"Sending Slack Notification to {slack_channel}")
+        try:
+            slack_client.chat_postMessage(channel=slack_channel, text=slack_message)
+
+        except SlackApiError as e:
+            log.error(
+                {"status": "ERROR", "message": f"Error sending Slack Notification: {e}"}
             )
 
     @staticmethod
