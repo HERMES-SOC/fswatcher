@@ -361,9 +361,11 @@ class FileSystemHandler(FileSystemEventHandler):
         log.info(f"Sending Slack Notification to {slack_channel}")
         try:
             color = {
-                "success": "#36a64f",
+                "success": "#3498db",
                 "error": "#ff0000",
             }
+            ct = datetime.now()
+            ts = ct.strftime("%y-%m-%d %H:%M:%S")
             slack_client.chat_postMessage(
                 channel=slack_channel,
                 attachments=[
@@ -374,7 +376,7 @@ class FileSystemHandler(FileSystemEventHandler):
                                 "type": "section",
                                 "text": {
                                     "type": "plain_text",
-                                    "text": f"{slack_message}",
+                                    "text": f"{ts} - {slack_message}",
                                 },
                             }
                         ],
