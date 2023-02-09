@@ -368,6 +368,7 @@ class FileSystemHandler(FileSystemEventHandler):
             ts = ct.strftime("%y-%m-%d %H:%M:%S")
             slack_client.chat_postMessage(
                 channel=slack_channel,
+                text=f"{ts} - {slack_message}",
                 attachments=[
                     {
                         "color": color[alert_type],
