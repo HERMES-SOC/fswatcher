@@ -95,9 +95,6 @@ class FileSystemHandler(FileSystemEventHandler):
             # Initialize the slack channel
             self.slack_channel = config.slack_channel
 
-            # Initialize the slack message
-            self.slack_message = config.slack_message
-
         except SlackApiError as e:
             error_code = int(e.response["Error"]["Code"])
             if error_code == 404:
@@ -174,15 +171,11 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Send Slack Notification about the event
             if self.slack_client is not None:
-                # Replace the filename in the slack message
-                self.slack_message = self.slack_message.replace(
-                    "$FILENAME$", event.get_parsed_path()
-                )
-
+                slack_message = f'FSWatcher: New file in watch directory - ({event.get_parsed_path()}) :file_folder:'
                 self._send_slack_notification(
                     slack_client=self.slack_client,
                     slack_channel=self.slack_channel,
-                    slack_message=self.slack_message + event.get_parsed_path(),
+                    slack_message=slack_message,
                 )
 
             # Get the log message
@@ -204,6 +197,15 @@ class FileSystemHandler(FileSystemEventHandler):
                     file_key=event.get_parsed_path(),
                     tags=tags,
                 )
+
+                # Send Slack Notification about the event
+                if self.slack_client is not None:
+                    slack_message = f'FSWatcher: File successfully uploaded to {event.bucket_name} - ({event.get_parsed_path()}) :file_folder:'
+                    self._send_slack_notification(
+                        slack_client=self.slack_client,
+                        slack_channel=self.slack_channel,
+                        slack_message=slack_message,
+                    )
 
             elif event.action_type == "DELETE" and self.allow_delete:
 

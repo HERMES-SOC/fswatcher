@@ -98,12 +98,6 @@ def create_argparse() -> ArgumentParser:
         help="Channel for Slack to send notifications",
     )
 
-    # Add Argument to parse slack message
-    parser.add_argument(
-        "-sm",
-        "--slack_message",
-        help="Message for Slack to send notifications",
-    )
 
     # Return the Argument Parser
     return parser
@@ -134,7 +128,6 @@ def get_args(args: ArgumentParser) -> dict:
     args_dict["SDC_AWS_ALLOW_DELETE"] = args.allow_delete
     args_dict["SDC_AWS_SLACK_TOKEN"] = args.slack_token
     args_dict["SDC_AWS_SLACK_CHANNEL"] = args.slack_channel
-    args_dict["SDC_AWS_SLACK_MESSAGE"] = args.slack_message
 
     # Return the arguments dictionary
     return args_dict
@@ -199,7 +192,6 @@ def get_config() -> FileSystemHandlerConfig:
             allow_delete=args.get("SDC_AWS_ALLOW_DELETE"),
             slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
             slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
-            slack_message=args.get("SDC_AWS_SLACK_MESSAGE"),
         )
 
     # Check if the environment variables are valid
@@ -214,7 +206,6 @@ def get_config() -> FileSystemHandlerConfig:
             allow_delete=env_vars.get("SDC_AWS_ALLOW_DELETE"),
             slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
             slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
-            slack_message=args.get("SDC_AWS_SLACK_MESSAGE"),
         )
 
     # If neither are valid, exit the program
