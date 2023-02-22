@@ -18,6 +18,7 @@ from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
+    FileMovedEvent
 )
 from typing import List
 from fswatcher import log
@@ -123,6 +124,9 @@ class FileSystemHandler(FileSystemEventHandler):
 
         log.info(f"Watching for file events in: {config.path}")
 
+        if config.backtrack:
+            log.info("Backtracking enabled")
+            self._backtrack()
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
@@ -464,12 +468,41 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
 
-    @staticmethod
-    # Function to open all files in a directory to trigger the on_modified event
-    def backtrack(path):
-        """
-        Function to  go back in time and trigger the on_modified event for all existing files in a directory
-        """
+    # Get all the files and directories in the specified directory as a list
+    def _get_all_files(self, path):
+        all_files = []
         for root, dirs, files in os.walk(path):
-            for name in files:
-                yield os.path.join(root, name)
+            for file in files:
+                all_files.append(os.path.join(root, file))
+        return all_files
+
+    # Go through the list of files and check if they are in the S3 bucket
+    def _check_files(self, files, bucket_name):
+        for file in files:
+            file_key = file.replace(self.base_path, "")
+            if not self.s3t.exists(bucket_name, file_key):
+                self._upload_to_s3_bucket(
+                    file,
+                    bucket_name,
+                    file_key,
+                    tags=self.tags,
+                )
+                self._log(
+                    boto3_session=self.boto3_session,
+                    action_type="upload",
+                    file_key=file_key,
+                    source_bucket=self.base_path,
+                    destination_bucket=bucket_name,
+                )
+
+    # Go through the list of files and create a FileMovedEvent then dispatch it
+    def _dispatch_events(self, files):
+        for file in files:
+            event = FileMovedEvent(file, file)
+            self.dispatch(event)
+
+    # Backtrack the directory tree
+    def _backtrack(self, path):
+        if path == self.base_path:
+            return
+        self._dispatch_events(self._get_all_files(path))

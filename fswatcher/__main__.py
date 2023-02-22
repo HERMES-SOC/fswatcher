@@ -25,8 +25,7 @@ def main() -> None:
     observer = Observer()
     observer.schedule(event_handler, config.path, recursive=True)
     observer.start()
-    if config.backtrack:
-        event_handler.backtrack(config.path)
+
     try:
         while True:
             time.sleep(1)
