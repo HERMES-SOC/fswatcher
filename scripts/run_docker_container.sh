@@ -24,6 +24,12 @@ DOCKERFILE_PATH=$(dirname $SCRIPT_PATH)
 # Print Dockerfile path
 echo "Dockerfile path: $DOCKERFILE_PATH"
 
+# Stop the docker container if it is already running
+if [ "$(docker ps | grep $CONTAINER_NAME)" ]; then
+    echo "Stopping existing container $CONTAINER_NAME"
+    docker stop $CONTAINER_NAME
+fi
+
 # Remove the docker container if it already exists
 if [ "$(docker ps -a | grep $CONTAINER_NAME)" ]; then
     echo "Removing existing container $CONTAINER_NAME"
