@@ -41,7 +41,6 @@ class FileSystemHandlerConfig:
         self.slack_channel = slack_channel
         self.slack_message = slack_message
         self.backtrack = backtrack
-        print(backtrack)
 
 
 def create_argparse() -> ArgumentParser:

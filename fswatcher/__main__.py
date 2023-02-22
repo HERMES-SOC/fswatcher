@@ -20,7 +20,6 @@ def main() -> None:
     # Initialize the FileSystemHandler
     event_handler = FileSystemHandler(config=config)
 
-    print(event_handler)
     # Initialize the Observer and start watching
     observer = Observer()
     observer.schedule(event_handler, config.path, recursive=True)
