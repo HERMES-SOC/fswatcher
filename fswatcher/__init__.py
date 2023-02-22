@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 print(os.environ.get("FILE_LOGGING"))
 # Create log file handler if file log environment variable is set
-if os.environ.get("FILE_LOGGING"):
+if os.environ.get("FILE_LOGGING") == "true":
     log.info("File logging enabled")
     file_handler = logging.FileHandler("fswatcher.log")
     file_handler.setLevel(logging.INFO)
