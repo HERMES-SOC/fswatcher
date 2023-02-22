@@ -89,7 +89,7 @@ class FileSystemHandler(FileSystemEventHandler):
         self.timestream_table = config.timestream_table
 
         # Initialize the slack client
-        if config.slack_token != None:
+        if config.slack_token is not None:
             try:
                 
                 # Initialize the slack client
@@ -187,7 +187,6 @@ class FileSystemHandler(FileSystemEventHandler):
                 else:
                     slack_message = f"FSWatcher: Unknown file event in watch directory - ({event.get_parsed_path()}) :file_folder:"
 
-                print(self.slack_client)
                 self._send_slack_notification(
                     slack_client=self.slack_client,
                     slack_channel=self.slack_channel,
@@ -462,4 +461,20 @@ class FileSystemHandler(FileSystemEventHandler):
         except botocore.exceptions.ClientError as e:
             log.error(
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
+            )
+
+    # Function to open all files in a directory to trigger the on_modified event
+    def _generate_existing_files_event(self, path):
+        """
+        Function to open all files in a directory to trigger the on_modified event
+        """
+        log.info(f"Opening all files in {path}")
+        try:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    with open(os.path.join(root, file), "r") as f:
+                        f.read()
+        except Exception as e:
+            log.error(
+                {"status": "ERROR", "message": f"Error opening all files in directory: {e}"}
             )

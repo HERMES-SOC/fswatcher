@@ -24,6 +24,8 @@ class FileSystemHandlerConfig:
         slack_token: str = "",
         slack_channel: str = "",
         slack_message: str = "",
+        backtrack: bool = False,
+
     ) -> None:
         """
         Class Constructor
@@ -39,6 +41,7 @@ class FileSystemHandlerConfig:
         self.slack_token = slack_token
         self.slack_channel = slack_channel
         self.slack_message = slack_message
+        self.backtrack = backtrack
 
 
 def create_argparse() -> ArgumentParser:
@@ -84,6 +87,14 @@ def create_argparse() -> ArgumentParser:
         help="Allow Delete Flag for the File System Watcher",
     )
 
+    # Add Argument to parse the backtrack flag
+    parser.add_argument(
+        "-bt",
+        "--allow_delete",
+        action="store_true",
+        help="Backtrack Flag for the File System Watcher",
+    )
+
     # Add Argument to parse slack token
     parser.add_argument(
         "-s",
@@ -127,29 +138,10 @@ def get_args(args: ArgumentParser) -> dict:
     args_dict["SDC_AWS_ALLOW_DELETE"] = args.allow_delete
     args_dict["SDC_AWS_SLACK_TOKEN"] = args.slack_token
     args_dict["SDC_AWS_SLACK_CHANNEL"] = args.slack_channel
+    args_dict["SDC_AWS_BACKTRACK"] = args.backtrack
 
     # Return the arguments dictionary
     return args_dict
-
-
-def get_envvars() -> dict:
-    """
-    Function to get the environment variables and return them as a dictionary
-
-    :return: Dictionary of environment variables
-    :rtype: dict
-    """
-    # Initialize the environment variables dictionary
-    env_vars = {}
-
-    # Get the environment variables
-    variables = [vars for vars in os.environ if "SDC_AWS" in vars]
-    for var in variables:
-        env_vars[var] = os.environ[var]
-
-    # Return the environment variables dictionary
-    return env_vars
-
 
 def validate_config_dict(config: dict) -> bool:
     """
@@ -178,7 +170,6 @@ def get_config() -> FileSystemHandlerConfig:
 
     # Get the arguments and environment variables
     args = get_args(create_argparse())
-    env_vars = get_envvars()
 
     if validate_config_dict(args):
         config = FileSystemHandlerConfig(
@@ -191,20 +182,7 @@ def get_config() -> FileSystemHandlerConfig:
             allow_delete=args.get("SDC_AWS_ALLOW_DELETE"),
             slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
             slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
-        )
-
-    # Check if the environment variables are valid
-    elif validate_config_dict(env_vars):
-        config = FileSystemHandlerConfig(
-            path=env_vars.get("SDC_AWS_WATCH_PATH"),
-            bucket_name=env_vars.get("SDC_AWS_S3_BUCKET"),
-            timestream_db=env_vars.get("SDC_AWS_TIMESTREAM_DB"),
-            timestream_table=env_vars.get("SDC_AWS_TIMESTREAM_TABLE"),
-            profile=env_vars.get("SDC_AWS_PROFILE"),
-            concurrency_limit=env_vars.get("SDC_AWS_CONCURRENCY_LIMIT"),
-            allow_delete=env_vars.get("SDC_AWS_ALLOW_DELETE"),
-            slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
-            slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
+            backtrack=args.get("SDC_AWS_BACKTRACK"),
         )
 
     # If neither are valid, exit the program
