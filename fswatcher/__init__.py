@@ -8,6 +8,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
+print(os.environ.get("FILE_LOGGING"))
 # Create log file handler if file log environment variable is set
 if os.environ.get("FILE_LOGGING"):
     log.info("File logging enabled")
