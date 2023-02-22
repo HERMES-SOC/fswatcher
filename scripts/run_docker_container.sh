@@ -86,6 +86,13 @@ else
     SDC_AWS_SLACK_CHANNEL=""
 fi
 
+# If ALLOW_DELETE is true, then add it to the environment variables else make it empty
+if [ "$ALLOW_DELETE" = true ]; then
+    SDC_AWS_ALLOW_DELETE="-d"
+else
+    SDC_AWS_ALLOW_DELETE=""
+fi
+
 
 # Print all the environment variables
 echo "SDC_AWS_S3_BUCKET: $SDC_AWS_S3_BUCKET"
@@ -94,6 +101,7 @@ echo "SDC_AWS_TIMESTREAM_DB: $SDC_AWS_TIMESTREAM_DB"
 echo "SDC_AWS_TIMESTREAM_TABLE: $SDC_AWS_TIMESTREAM_TABLE"
 echo "SDC_AWS_SLACK_TOKEN: $SDC_AWS_SLACK_TOKEN"
 echo "SDC_AWS_SLACK_CHANNEL: $SDC_AWS_SLACK_CHANNEL"
+echo "SDC_AWS_ALLOW_DELETE: $SDC_AWS_ALLOW_DELETE"
 
 # Run the docker container
 docker run -it \
@@ -104,6 +112,7 @@ docker run -it \
     -e SDC_AWS_TIMESTREAM_TABLE="$SDC_AWS_TIMESTREAM_TABLE" \
     -e SDC_AWS_SLACK_TOKEN="$SDC_AWS_SLACK_TOKEN" \
     -e SDC_AWS_SLACK_CHANNEL="$SDC_AWS_SLACK_CHANNEL" \
+    -e SDC_AWS_ALLOW_DELETE="$SDC_AWS_ALLOW_DELETE" \
     -e AWS_REGION="$AWS_REGION" \
     -v /etc/passwd:/etc/passwd \
     -v $WATCH_DIR:/watch \
