@@ -127,6 +127,7 @@ class FileSystemHandler(FileSystemEventHandler):
         if config.backtrack:
             log.info("Backtracking enabled")
             print(config.backtrack_datetime)
+            print(self._parse_datetime(config.backtrack_datetime))
             self._backtrack(config.path)
 
     def on_any_event(self, event: FileSystemEvent) -> None:
