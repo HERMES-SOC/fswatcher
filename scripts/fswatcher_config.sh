@@ -24,7 +24,7 @@ AWS_REGION="us-east-1"
 TIMESTREAM_DB=""
 
 # TimeStream table name (optional)
-TIMESTREAM_TABLE=""
+TIMESTREAM_TABLE="sdc_aws_s3_bucket_log_table"
 
 # Slack token (optional)
 SLACK_TOKEN=""

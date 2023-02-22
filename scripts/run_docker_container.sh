@@ -46,7 +46,7 @@ SDC_AWS_CONCURRENCY_LIMIT="-c $CONCURRENCY_LIMIT"
 
 # If TimeStream database name is not "", then add it to the environment variables
 if [ ! -z ${TIMESTREAM_DB+x} ]; then
-    SDC_AWS_TIMESTREAM_DB="-td $TIMESTREAM_DB"
+    SDC_AWS_TIMESTREAM_DB="-t $TIMESTREAM_DB"
 else
     SDC_AWS_TIMESTREAM_DB=""
 fi
