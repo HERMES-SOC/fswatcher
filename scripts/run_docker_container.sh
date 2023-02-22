@@ -59,7 +59,7 @@ unset SDC_AWS_SLACK_TOKEN
 unset SDC_AWS_SLACK_CHANNEL
 unset SDC_AWS_ALLOW_DELETE
 unset SDC_AWS_BACKTRACK
-unset SDC_AWS_BACKTRACK_DATETIME
+unset SDC_AWS_BACKTRACK_DATE
 
 # Docker environment variables
 SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
@@ -110,10 +110,10 @@ else
 fi
 
 # If Slack channel is not "", then add it to the environment variables else make it empty
-if [ "$BACKTRACK_DATETIME" != "" ]; then
-    SDC_AWS_BACKTRACK_DATETIME="-bd '$BACKTRACK_DATETIME'"
+if [ "$BACKTRACK_DATE" != "" ]; then
+    SDC_AWS_BACKTRACK_DATE="-bd '$BACKTRACK_DATE'"
 else
-    SDC_AWS_BACKTRACK_DATETIME=""
+    SDC_AWS_BACKTRACK_DATE=""
 fi
 
 # If File Logging is true, then add it to the environment variables else make it empty
@@ -132,7 +132,7 @@ echo "SDC_AWS_ALLOW_DELETE: $SDC_AWS_ALLOW_DELETE"
 echo "AWS_REGION: $AWS_REGION"
 echo "FILE_LOGGING: $FILE_LOGGING"
 echo "BACKTRACK: $BACKTRACK"
-echo "BACKTRACK_DATETIME: $BACKTRACK_DATETIME"
+echo "BACKTRACK_DATE: $BACKTRACK_DATE"
 
 # Run the docker container
 docker run -it \
@@ -145,7 +145,7 @@ docker run -it \
     -e SDC_AWS_SLACK_CHANNEL="$SDC_AWS_SLACK_CHANNEL" \
     -e SDC_AWS_ALLOW_DELETE="$SDC_AWS_ALLOW_DELETE" \
     -e SDC_AWS_BACKTRACK="$SDC_AWS_BACKTRACK" \
-    -e SDC_AWS_BACKTRACK_DATETIME="$SDC_AWS_BACKTRACK_DATETIME" \
+    -e SDC_AWS_BACKTRACK_DATE="$SDC_AWS_BACKTRACK_DATE" \
     -e AWS_REGION="$AWS_REGION" \
     -e FILE_LOGGING="$FILE_LOGGING" \
     -v /etc/passwd:/etc/passwd \

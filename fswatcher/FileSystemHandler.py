@@ -126,8 +126,8 @@ class FileSystemHandler(FileSystemEventHandler):
 
         if config.backtrack:
             log.info("Backtracking enabled")
-            print(config.backtrack_datetime)
-            print(self._parse_datetime(config.backtrack_datetime))
+            print(config.backtrack_date)
+            print(self._parse_datetime(config.backtrack_date))
             self._backtrack(config.path)
 
     def on_any_event(self, event: FileSystemEvent) -> None:
@@ -527,8 +527,5 @@ class FileSystemHandler(FileSystemEventHandler):
 
     # Parse datetime from string
     def _parse_datetime(self, date_string):
+        date_string = f"{date_string} 00:00:00"
         return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-
-    # test parse datetime
-    def _test_parse_datetime(self):
-        return self._parse_datetime("2021-01-01 00:00:00")
