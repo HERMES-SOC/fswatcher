@@ -39,12 +39,12 @@ docker build -t $IMAGE_NAME $DOCKERFILE_PATH
 echo "Running docker container $CONTAINER_NAME"
 
 # Unset all the environment variables
-unset SDC_AWS_S3_BUCKET
-unset SDC_AWS_CONCURRENCY_LIMIT
-unset SDC_AWS_TIMESTREAM_DB
-unset SDC_AWS_TIMESTREAM_TABLE
-unset SDC_AWS_SLACK_TOKEN
-unset SDC_AWS_SLACK_CHANNEL
+unset $SDC_AWS_S3_BUCKET
+unset $SDC_AWS_CONCURRENCY_LIMIT
+unset $SDC_AWS_TIMESTREAM_DB
+unset $SDC_AWS_TIMESTREAM_TABLE
+unset $SDC_AWS_SLACK_TOKEN
+unset $SDC_AWS_SLACK_CHANNEL
 
 # Docker environment variables
 SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
