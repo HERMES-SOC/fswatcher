@@ -503,6 +503,5 @@ class FileSystemHandler(FileSystemEventHandler):
 
     # Backtrack the directory tree
     def _backtrack(self, path):
-        if path == self.base_path:
-            return
+
         self._dispatch_events(self._get_all_files(path))
