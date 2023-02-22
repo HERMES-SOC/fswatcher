@@ -468,19 +468,8 @@ class FileSystemHandler(FileSystemEventHandler):
     # Function to open all files in a directory to trigger the on_modified event
     def backtrack(path):
         """
-        Function to open all files in a directory and close them to trigger the on_modified event
+        Function to  go back in time and trigger the on_modified event for all existing files in a directory
         """
-        log.info(f"Object ({path}) - Backtracking Directory")
-        try:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    print(file)
-                    with open(os.path.join(root, file), "r") as f:
-                        f.close()
-
-            log.info(f"Object ({path}) - Successfully Backtracked Directory")
-
-        except Exception as e:
-            log.error(
-                {"status": "ERROR", "message": f"Error backtracking directory: {e}"}
-            )
+        for root, dirs, files in os.walk(path):
+            for name in files:
+                yield os.path.join(root, name)

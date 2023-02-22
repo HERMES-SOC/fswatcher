@@ -8,6 +8,7 @@ from watchdog.events import (
     FileModifiedEvent,
     FileMovedEvent,
     FileDeletedEvent,
+    FileClosedEvent
 )
 
 
@@ -23,6 +24,7 @@ class FileSystemHandlerEvent:
     dest_path: str = ""
     action_type: str = ""
     completed: bool = False
+    backtrack: bool = False
 
     def __init__(
         self, event: FileSystemEvent, bucket_name: str, watch_path: str
