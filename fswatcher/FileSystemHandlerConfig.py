@@ -24,6 +24,7 @@ class FileSystemHandlerConfig:
         slack_channel: str = "",
         slack_message: str = "",
         backtrack: bool = False,
+        backtrack_datetime: str = "",
 
     ) -> None:
         """
@@ -41,6 +42,8 @@ class FileSystemHandlerConfig:
         self.slack_channel = slack_channel
         self.slack_message = slack_message
         self.backtrack = backtrack
+        self.backtrack_datetime = backtrack_datetime
+        print(self.backtrack_datetime)
 
 
 def create_argparse() -> ArgumentParser:
@@ -94,6 +97,13 @@ def create_argparse() -> ArgumentParser:
         help="Backtrack Flag for the File System Watcher",
     )
 
+    # Add Argument to parse the backtrack datetime
+    parser.add_argument(
+        "-btt",
+        "--backtrack_datetime",
+        help="Backtrack Datetime for the File System Watcher",
+    )
+
     # Add Argument to parse slack token
     parser.add_argument(
         "-s",
@@ -138,6 +148,7 @@ def get_args(args: ArgumentParser) -> dict:
     args_dict["SDC_AWS_SLACK_TOKEN"] = args.slack_token
     args_dict["SDC_AWS_SLACK_CHANNEL"] = args.slack_channel
     args_dict["SDC_AWS_BACKTRACK"] = args.backtrack
+    args_dict["SDC_AWS_BACKTRACK_DATETIME"] = args.backtrack_datetime
 
     # Return the arguments dictionary
     return args_dict
@@ -182,6 +193,7 @@ def get_config() -> FileSystemHandlerConfig:
             slack_token=args.get("SDC_AWS_SLACK_TOKEN"),
             slack_channel=args.get("SDC_AWS_SLACK_CHANNEL"),
             backtrack=args.get("SDC_AWS_BACKTRACK"),
+            backtrack_datetime=args.get("SDC_AWS_BACKTRACK_DATETIME"),
         )
 
     # If neither are valid, exit the program

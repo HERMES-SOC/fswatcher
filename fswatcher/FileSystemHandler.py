@@ -523,3 +523,11 @@ class FileSystemHandler(FileSystemEventHandler):
     # Backtrack the directory tree
     def _backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
+
+    # Parse datetime from string
+    def _parse_datetime(self, date_string):
+        return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+    
+    # test parse datetime
+    def _test_parse_datetime(self):
+        return self._parse_datetime("2021-01-01 00:00:00")
