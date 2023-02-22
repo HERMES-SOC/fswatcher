@@ -121,7 +121,7 @@ docker run -it \
     -e SDC_AWS_SLACK_CHANNEL="$SDC_AWS_SLACK_CHANNEL" \
     -e SDC_AWS_ALLOW_DELETE="$SDC_AWS_ALLOW_DELETE" \
     -e AWS_REGION="$AWS_REGION" \
-    -e FILE_LOGGING="$FILE_LOGGING"
+    -e FILE_LOGGING="$FILE_LOGGING" \
     -v /etc/passwd:/etc/passwd \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
