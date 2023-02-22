@@ -89,7 +89,7 @@ def create_argparse() -> ArgumentParser:
     # Add Argument to parse the backtrack flag
     parser.add_argument(
         "-bt",
-        "--allow_delete",
+        "--backtrack",
         action="store_true",
         help="Backtrack Flag for the File System Watcher",
     )
