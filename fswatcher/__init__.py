@@ -10,11 +10,9 @@ log = logging.getLogger(__name__)
 
 # Create log file handler if file log environment variable is set
 if os.environ.get("FILE_LOGGING"):
+    log.info("File logging enabled")
     file_handler = logging.FileHandler("fswatcher.log")
     file_handler.setLevel(logging.INFO)
-
-
-    # Log to file and console
 
     # Create formatter and add it to the handlers
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
