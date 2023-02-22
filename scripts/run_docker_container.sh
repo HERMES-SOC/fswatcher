@@ -109,9 +109,7 @@ else
 fi
 
 # Run the docker container
-docker run \
-    -it \
-    --name $CONTAINER_NAME \
+docker run -it --name $CONTAINER_NAME \
     -e SDC_AWS_S3_BUCKET="$SDC_AWS_S3_BUCKET" \
     -e SDC_AWS_CONCURRENCY_LIMIT="$SDC_AWS_CONCURRENCY_LIMIT" \
     -e SDC_AWS_TIMESTREAM_DB="$SDC_AWS_TIMESTREAM_DB" \
