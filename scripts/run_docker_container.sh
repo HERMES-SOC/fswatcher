@@ -45,14 +45,14 @@ SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
 SDC_AWS_CONCURRENCY_LIMIT="-c $CONCURRENCY_LIMIT"
 
 # If TimeStream database name is not "", then add it to the environment variables
-if [ ! -z "$TIMESTREAM_DB" ]; then
+if [ ! -z ${TIMESTREAM_DB+x} ]; then
     SDC_AWS_TIMESTREAM_DB="-td $TIMESTREAM_DB"
 else
     SDC_AWS_TIMESTREAM_DB=""
 fi
 
-# If TimeStream table name is not "", then add it to the environment variables
-if [ ! -z "$TIMESTREAM_TABLE" ]; then
+# If Timestream table name is not "", then add it to the environment variables
+if [ ! -z ${TIMESTREAM_TABLE+x} ]; then
     SDC_AWS_TIMESTREAM_TABLE="-tt $TIMESTREAM_TABLE"
 else
     SDC_AWS_TIMESTREAM_TABLE=""
@@ -71,6 +71,14 @@ if [ ! -z "$SLACK_CHANNEL" ]; then
 else
     SDC_AWS_SLACK_CHANNEL=""
 fi
+
+# Print all the environment variables
+echo "SDC_AWS_S3_BUCKET: $SDC_AWS_S3_BUCKET"
+echo "SDC_AWS_CONCURRENCY_LIMIT: $SDC_AWS_CONCURRENCY_LIMIT"
+echo "SDC_AWS_TIMESTREAM_DB: $SDC_AWS_TIMESTREAM_DB"
+echo "SDC_AWS_TIMESTREAM_TABLE: $SDC_AWS_TIMESTREAM_TABLE"
+echo "SDC_AWS_SLACK_TOKEN: $SDC_AWS_SLACK_TOKEN"
+echo "SDC_AWS_SLACK_CHANNEL: $SDC_AWS_SLACK_CHANNEL"
 
 # Run the docker container
 docker run -it \

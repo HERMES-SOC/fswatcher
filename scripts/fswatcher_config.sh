@@ -21,7 +21,7 @@ CONCURRENCY_LIMIT=10
 AWS_REGION="us-east-1"
 
 # TimeStream database name (optional)
-TIMESTREAM_DB="sdc"
+TIMESTREAM_DB=""
 
 # TimeStream table name (optional)
 TIMESTREAM_TABLE=""
