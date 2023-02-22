@@ -123,12 +123,6 @@ class FileSystemHandler(FileSystemEventHandler):
 
         log.info(f"Watching for file events in: {config.path}")
 
-        
-        if config.backtrack:
-            log.info("Backtracking directory to upload all files")
-            # Backtrack the directory and upload all files
-            self._backtrack_directory(config.path)
-
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
