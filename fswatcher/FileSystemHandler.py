@@ -126,6 +126,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         if config.backtrack:
             log.info("Backtracking enabled")
+            # datetime_now = datetime.now()
             self._backtrack(config.path)
 
     def on_any_event(self, event: FileSystemEvent) -> None:
@@ -517,5 +518,5 @@ class FileSystemHandler(FileSystemEventHandler):
 
 
     # Backtrack the directory tree
-    def _backtrack(self, path):
-        self._dispatch_events(self._get_all_files(path))
+    def _backtrack(self, path, date_filter=None):
+        self._dispatch_events(self._get_files(path, date_filter))
