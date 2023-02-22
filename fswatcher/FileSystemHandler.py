@@ -470,8 +470,9 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
 
+    @staticmethod
     # Function to open all files in a directory to trigger the on_modified event
-    def _backtrack_directory(self, path):
+    def backtrack(path):
         """
         Function to open all files in a directory and close them to trigger the on_modified event
         """
