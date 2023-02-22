@@ -14,6 +14,12 @@ S3_BUCKET_NAME=swsoc-unsorted
 # Filepath to the directory to be watched
 WATCH_DIR=~/watch_directory
 
+# Verify that the directory to be watched exists
+if [ ! -d "$WATCH_DIR" ]; then
+    echo "Directory $WATCH_DIR does not exist"
+    exit 1
+fi
+
 # Concurrency limit
 CONCURRENCY_LIMIT=10
 
@@ -74,24 +80,32 @@ SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
 
 SDC_AWS_CONCURRENCY_LIMIT="-c $CONCURRENCY_LIMIT"
 
-# If TimeStream database name is provided, then add it to the environment variables
+# If TimeStream database name is not "", then add it to the environment variables
 if [ ! -z "$TIMESTREAM_DB" ]; then
-    SDC_AWS_TIMESTREAM_DB="-t $TIMESTREAM_DB"
+    SDC_AWS_TIMESTREAM_DB="-td $TIMESTREAM_DB"
+else
+    SDC_AWS_TIMESTREAM_DB=""
 fi
 
-# If TimeStream table name is provided, then add it to the environment variables
+# If TimeStream table name is not "", then add it to the environment variables
 if [ ! -z "$TIMESTREAM_TABLE" ]; then
     SDC_AWS_TIMESTREAM_TABLE="-tt $TIMESTREAM_TABLE"
+else
+    SDC_AWS_TIMESTREAM_TABLE=""
 fi
 
-# If Slack token is provided, then add it to the environment variables
+# If Slack token is not "", then add it to the environment variables else make it empty
 if [ ! -z "$SLACK_TOKEN" ]; then
     SDC_AWS_SLACK_TOKEN="-s $SLACK_TOKEN"
+else
+    SDC_AWS_SLACK_TOKEN=""
 fi
 
-# If Slack channel is provided, then add it to the environment variables
+# If Slack channel is not "", then add it to the environment variables else make it empty
 if [ ! -z "$SLACK_CHANNEL" ]; then
-    SDC_AWS_SLACK_CHANNEL="-sc $SLACK_CHANNEL"
+    SDC_AWS_SLACK_CHANNEL="-c $SLACK_CHANNEL"
+else
+    SDC_AWS_SLACK_CHANNEL=""
 fi
 
 # Run the docker container
