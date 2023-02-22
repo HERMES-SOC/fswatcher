@@ -123,6 +123,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         log.info(f"Watching for file events in: {config.path}")
 
+        
         if config.backtrack:
             log.info("Backtracking directory to upload all files")
             # Backtrack the directory and upload all files
@@ -472,15 +473,19 @@ class FileSystemHandler(FileSystemEventHandler):
     # Function to open all files in a directory to trigger the on_modified event
     def _backtrack_directory(self, path):
         """
-        Function to open all files in a directory to trigger the on_modified event
+        Function to open all files in a directory and close them to trigger the on_modified event
         """
-        log.info(f"Opening all files in {path}")
+        log.info(f"Object ({path}) - Backtracking Directory")
         try:
             for root, dirs, files in os.walk(path):
                 for file in files:
+                    print(file)
                     with open(os.path.join(root, file), "r") as f:
-                        f.read()
+                        f.close()
+
+            log.info(f"Object ({path}) - Successfully Backtracked Directory")
+
         except Exception as e:
             log.error(
-                {"status": "ERROR", "message": f"Error opening all files in directory: {e}"}
+                {"status": "ERROR", "message": f"Error backtracking directory: {e}"}
             )
