@@ -116,7 +116,7 @@ echo "SDC_AWS_SLACK_CHANNEL: $SDC_AWS_SLACK_CHANNEL"
 echo "SDC_AWS_ALLOW_DELETE: $SDC_AWS_ALLOW_DELETE"
 echo "AWS_REGION: $AWS_REGION"
 echo "FILE_LOGGING: $FILE_LOGGING"
-echo "BACKTRACK: $BACKTRACK"
+echo "BACKTRACK: $SDC_AWS_BACKTRACK"
 
 # Run the docker container
 docker run -it \
@@ -128,9 +128,9 @@ docker run -it \
     -e SDC_AWS_SLACK_TOKEN="$SDC_AWS_SLACK_TOKEN" \
     -e SDC_AWS_SLACK_CHANNEL="$SDC_AWS_SLACK_CHANNEL" \
     -e SDC_AWS_ALLOW_DELETE="$SDC_AWS_ALLOW_DELETE" \
+    -e SDC_AWS_BACKTRACK="$SDC_AWS_BACKTRACK" \
     -e AWS_REGION="$AWS_REGION" \
     -e FILE_LOGGING="$FILE_LOGGING" \
-    -e BACKTRACK="$BACKTRACK" \
     -v /etc/passwd:/etc/passwd \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
