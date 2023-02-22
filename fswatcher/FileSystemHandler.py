@@ -527,5 +527,6 @@ class FileSystemHandler(FileSystemEventHandler):
 
     # Parse datetime from string
     def _parse_datetime(self, date_string):
+        date_string= date_string.replace("'", "")
         date_string = f"{date_string} 00:00:00"
         return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
