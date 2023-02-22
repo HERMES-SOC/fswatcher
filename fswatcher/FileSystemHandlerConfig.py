@@ -43,7 +43,6 @@ class FileSystemHandlerConfig:
         self.slack_message = slack_message
         self.backtrack = backtrack
         self.backtrack_datetime = backtrack_datetime
-        print(self.backtrack_datetime)
 
 
 def create_argparse() -> ArgumentParser:
@@ -99,7 +98,7 @@ def create_argparse() -> ArgumentParser:
 
     # Add Argument to parse the backtrack datetime
     parser.add_argument(
-        "-btt",
+        "-bd",
         "--backtrack_datetime",
         help="Backtrack Datetime for the File System Watcher",
     )

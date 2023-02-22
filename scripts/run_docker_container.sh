@@ -113,7 +113,7 @@ fi
 
 # If Slack channel is not "", then add it to the environment variables else make it empty
 if [ "$BACKTRACK_DATETIME" != "" ]; then
-    SDC_AWS_BACKTRACK_DATETIME="-btt $BACKTRACK_DATETIME"
+    SDC_AWS_BACKTRACK_DATETIME="-bd $BACKTRACK_DATETIME"
 else
     SDC_AWS_BACKTRACK_DATETIME=""
 fi
