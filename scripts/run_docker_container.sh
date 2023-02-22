@@ -61,11 +61,6 @@ if [ "$(docker ps -a | grep $CONTAINER_NAME)" ]; then
     docker rm $CONTAINER_NAME
 fi
 
-# Remove the docker image if it already exists
-if [ "$(docker images | grep $IMAGE_NAME)" ]; then
-    echo "Removing existing image $IMAGE_NAME"
-    docker rmi $IMAGE_NAME
-fi
 
 # Build the docker image
 echo "Building docker image $IMAGE_NAME"
