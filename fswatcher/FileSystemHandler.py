@@ -88,22 +88,26 @@ class FileSystemHandler(FileSystemEventHandler):
         self.timestream_table = config.timestream_table
 
         # Initialize the slack client
-        try:
-            # Initialize the slack client
-            self.slack_client = WebClient(token=config.slack_token)
+        if config.slack_token != None:
+            try:
+                
+                # Initialize the slack client
+                self.slack_client = WebClient(token=config.slack_token)
 
-            # Initialize the slack channel
-            self.slack_channel = config.slack_channel
+                # Initialize the slack channel
+                self.slack_channel = config.slack_channel
 
-        except SlackApiError as e:
-            error_code = int(e.response["Error"]["Code"])
-            if error_code == 404:
-                log.error(
-                    {
-                        "status": "ERROR",
-                        "message": f"Slack Token ({config.slack_token}) is invalid",
-                    }
-                )
+            except SlackApiError as e:
+                error_code = int(e.response["Error"]["Code"])
+                if error_code == 404:
+                    log.error(
+                        {
+                            "status": "ERROR",
+                            "message": f"Slack Token ({config.slack_token}) is invalid",
+                        }
+                    )
+        else:
+            self.slack_client = None
 
         # Validate the path
         if not os.path.exists(config.path):
@@ -182,6 +186,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 else:
                     slack_message = f"FSWatcher: Unknown file event in watch directory - ({event.get_parsed_path()}) :file_folder:"
 
+                print(self.slack_client)
                 self._send_slack_notification(
                     slack_client=self.slack_client,
                     slack_channel=self.slack_channel,
