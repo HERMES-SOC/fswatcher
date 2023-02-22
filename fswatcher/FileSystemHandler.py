@@ -4,6 +4,7 @@ File System Handler Module for SDC AWS File System Watcher
 
 import sys
 import os
+import time
 from datetime import datetime
 from urllib import parse
 import boto3
@@ -17,6 +18,7 @@ from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
+    FileMovedEvent
 )
 from typing import List
 from fswatcher import log
@@ -88,22 +90,26 @@ class FileSystemHandler(FileSystemEventHandler):
         self.timestream_table = config.timestream_table
 
         # Initialize the slack client
-        try:
-            # Initialize the slack client
-            self.slack_client = WebClient(token=config.slack_token)
+        if config.slack_token is not None:
+            try:
+                
+                # Initialize the slack client
+                self.slack_client = WebClient(token=config.slack_token)
 
-            # Initialize the slack channel
-            self.slack_channel = config.slack_channel
+                # Initialize the slack channel
+                self.slack_channel = config.slack_channel
 
-        except SlackApiError as e:
-            error_code = int(e.response["Error"]["Code"])
-            if error_code == 404:
-                log.error(
-                    {
-                        "status": "ERROR",
-                        "message": f"Slack Token ({config.slack_token}) is invalid",
-                    }
-                )
+            except SlackApiError as e:
+                error_code = int(e.response["Error"]["Code"])
+                if error_code == 404:
+                    log.error(
+                        {
+                            "status": "ERROR",
+                            "message": f"Slack Token ({config.slack_token}) is invalid",
+                        }
+                    )
+        else:
+            self.slack_client = None
 
         # Validate the path
         if not os.path.exists(config.path):
@@ -117,6 +123,10 @@ class FileSystemHandler(FileSystemEventHandler):
         self.path = config.path
 
         log.info(f"Watching for file events in: {config.path}")
+
+        if config.backtrack:
+            log.info("Backtracking enabled")
+            self._backtrack(config.path, self._parse_datetime(config.backtrack_date))
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
@@ -320,7 +330,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 slack_message=f"FSWatcher: Error uploading file to {bucket_name} - ({file_key}) :file_folder:",
                 alert_type="error",
             )
-
+    
     def _delete_from_s3_bucket(self, bucket_name, file_key):
         """
         Function to Delete a file from an S3 Bucket
@@ -457,3 +467,66 @@ class FileSystemHandler(FileSystemEventHandler):
             log.error(
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
+
+    # Recursively get all file in the specified directory as a list with optional date filter (datetime)
+    def _get_files(self, path, date_filter=None):
+        files = []
+        for file in os.listdir(path):
+            file = os.path.join(path, file)
+            if os.path.isfile(file):
+                if date_filter:
+                    if self._check_date(file, date_filter):
+                        files.append(file)
+                else:
+                    files.append(file)
+            elif os.path.isdir(file):
+                files.extend(self._get_files(file, date_filter))
+        return files
+
+    # Check if the file is newer than the date filter
+    def _check_date(self, file, date_filter):
+
+        # Change date_filter from datetime to match modified time
+        date_filter = datetime.timestamp(date_filter)
+
+        if os.path.getmtime(file) > date_filter:
+            return True
+        return False
+
+    # Go through the list of files and check if they are in the S3 bucket
+    def _check_files(self, files, bucket_name):
+        for file in files:
+            file_key = file.replace(self.base_path, "")
+            if not self.s3t.exists(bucket_name, file_key):
+                self._upload_to_s3_bucket(
+                    file,
+                    bucket_name,
+                    file_key,
+                    tags=self.tags,
+                )
+                self._log(
+                    boto3_session=self.boto3_session,
+                    action_type="upload",
+                    file_key=file_key,
+                    source_bucket=self.base_path,
+                    destination_bucket=bucket_name,
+                )
+
+    # Go through the list of files and create a FileMovedEvent then dispatch it
+    def _dispatch_events(self, files):
+        for file in files:
+            event = FileMovedEvent(file, file)
+            self.dispatch(event)
+
+
+    # Backtrack the directory tree
+    def _backtrack(self, path, date_filter=None):
+        self._dispatch_events(self._get_files(path, date_filter))
+
+    # Parse datetime from string
+    def _parse_datetime(self, date_string):
+        if date_string is None or date_string == "":
+            return None
+        date_string= date_string.replace("'", "")
+        date_string = f"{date_string} 00:00:00"
+        return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
