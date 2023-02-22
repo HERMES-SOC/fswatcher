@@ -4,7 +4,7 @@ File System Handler Module for SDC AWS File System Watcher
 
 import sys
 import os
-from datetime import datetime
+from datetime import time, datetime
 from urllib import parse
 import boto3
 import botocore
@@ -320,7 +320,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 slack_message=f"FSWatcher: Error uploading file to {bucket_name} - ({file_key}) :file_folder:",
                 alert_type="error",
             )
-
+    
     def _delete_from_s3_bucket(self, bucket_name, file_key):
         """
         Function to Delete a file from an S3 Bucket
