@@ -123,6 +123,11 @@ class FileSystemHandler(FileSystemEventHandler):
 
         log.info(f"Watching for file events in: {config.path}")
 
+        if config.backtrack:
+            # Backtrack the directory and upload all files
+            self._backtrack_directory(config.path)
+
+
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
         Overloaded Function to deal with any event
@@ -464,7 +469,7 @@ class FileSystemHandler(FileSystemEventHandler):
             )
 
     # Function to open all files in a directory to trigger the on_modified event
-    def _generate_existing_files_event(self, path):
+    def _backtrack_directory(self, path):
         """
         Function to open all files in a directory to trigger the on_modified event
         """

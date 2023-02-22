@@ -3,7 +3,6 @@ File System Handler Configuration Module
 """
 
 from argparse import ArgumentParser
-import os
 from fswatcher import log
 
 
