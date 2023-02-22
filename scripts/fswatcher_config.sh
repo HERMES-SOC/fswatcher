@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Environmental Variables for fswatcher
 
 # Container name
@@ -19,7 +21,7 @@ CONCURRENCY_LIMIT=10
 AWS_REGION="us-east-1"
 
 # TimeStream database name (optional)
-TIMESTREAM_DB=""
+TIMESTREAM_DB="sdc"
 
 # TimeStream table name (optional)
 TIMESTREAM_TABLE=""

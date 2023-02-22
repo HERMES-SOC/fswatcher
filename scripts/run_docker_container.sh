@@ -1,7 +1,8 @@
 #! /bin/bash
+
 # Script to build and run the fswatcher docker container
 
-source fswatcher.env
+source fswatcher_config.sh
 
 # Verify that the directory to be watched exists
 if [ ! -d "$WATCH_DIR" ]; then
