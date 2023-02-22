@@ -4,7 +4,8 @@ File System Handler Module for SDC AWS File System Watcher
 
 import sys
 import os
-from datetime import time, datetime
+import time
+from datetime import datetime
 from urllib import parse
 import boto3
 import botocore

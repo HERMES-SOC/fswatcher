@@ -59,14 +59,14 @@ else
 fi
 
 # If Slack token is not "", then add it to the environment variables else make it empty
-if [ ! -z "$SLACK_TOKEN" ]; then
+if [ ! -z ${SLACK_TOKEN+x} ]; then
     SDC_AWS_SLACK_TOKEN="-s $SLACK_TOKEN"
 else
     SDC_AWS_SLACK_TOKEN=""
 fi
 
 # If Slack channel is not "", then add it to the environment variables else make it empty
-if [ ! -z "$SLACK_CHANNEL" ]; then
+if [ ! -z ${SLACK_CHANNEL+x} ]; then
     SDC_AWS_SLACK_CHANNEL="-c $SLACK_CHANNEL"
 else
     SDC_AWS_SLACK_CHANNEL=""
