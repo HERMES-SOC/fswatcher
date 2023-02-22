@@ -94,6 +94,11 @@ else
     SDC_AWS_ALLOW_DELETE=""
 fi
 
+# If ALLOW_DELETE is true, then add it to the environment variables else make it empty
+if [ "$FILE_LOGGING" = true ]; then
+    FILE_LOGGING=true
+fi
+
 # Print all the environment variables
 echo "SDC_AWS_S3_BUCKET: $SDC_AWS_S3_BUCKET"
 echo "SDC_AWS_CONCURRENCY_LIMIT: $SDC_AWS_CONCURRENCY_LIMIT"
@@ -114,6 +119,7 @@ docker run -it \
     -e SDC_AWS_SLACK_CHANNEL="$SDC_AWS_SLACK_CHANNEL" \
     -e SDC_AWS_ALLOW_DELETE="$SDC_AWS_ALLOW_DELETE" \
     -e AWS_REGION="$AWS_REGION" \
+    -e FILE_LOGGING="$FILE_LOGGING"
     -v /etc/passwd:/etc/passwd \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \

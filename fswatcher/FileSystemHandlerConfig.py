@@ -32,9 +32,7 @@ class FileSystemHandlerConfig:
         self.path = path
         self.bucket_name = bucket_name
         self.timestream_db = timestream_db
-        print("timestream_db: ", timestream_db)
         self.timestream_table = timestream_table
-        print("timestream_table: ", timestream_table)
         self.profile = profile
         self.concurrency_limit = concurrency_limit
         self.allow_delete = allow_delete
