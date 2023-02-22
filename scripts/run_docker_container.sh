@@ -89,7 +89,7 @@ fi
 
 # If ALLOW_DELETE is true, then add it to the environment variables else make it empty
 if [ "$ALLOW_DELETE" = true ]; then
-    SDC_AWS_ALLOW_DELETE="-d"
+    SDC_AWS_ALLOW_DELETE="-a"
 else
     SDC_AWS_ALLOW_DELETE=""
 fi
@@ -118,4 +118,3 @@ docker run -it \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
     $IMAGE_NAME
-
