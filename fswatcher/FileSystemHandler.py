@@ -468,13 +468,23 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
 
-    # Get all the files and directories in the specified directory as a list
-    def _get_all_files(self, path):
-        all_files = []
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                all_files.append(os.path.join(root, file))
-        return all_files
+    # Get all the files and directories in the specified directory as a list with optional date filter
+    def _get_files(self, path, date_filter=None):
+        files = []
+        for file in os.listdir(path):
+            file_path = os.path.join(path, file)
+            if os.path.isfile(file_path):
+                if not date_filter:
+                    files.append(file_path)
+                elif date_filter and self._check_date(file_path, date_filter):
+                    files.append(file_path)
+        return files
+
+    # Check if the file is newer than the date filter
+    def _check_date(self, file, date_filter):
+        if os.path.getmtime(file) > date_filter:
+            return True
+        return False
 
     # Go through the list of files and check if they are in the S3 bucket
     def _check_files(self, files, bucket_name):
@@ -501,7 +511,7 @@ class FileSystemHandler(FileSystemEventHandler):
             event = FileMovedEvent(file, file)
             self.dispatch(event)
 
+
     # Backtrack the directory tree
     def _backtrack(self, path):
-
         self._dispatch_events(self._get_all_files(path))
