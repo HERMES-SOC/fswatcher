@@ -44,14 +44,6 @@ docker build -t $IMAGE_NAME $DOCKERFILE_PATH
 # Run the docker container
 echo "Running docker container $CONTAINER_NAME"
 
-# Unset all the environment variables
-unset SDC_AWS_S3_BUCKET
-unset SDC_AWS_CONCURRENCY_LIMIT
-unset SDC_AWS_TIMESTREAM_DB
-unset SDC_AWS_TIMESTREAM_TABLE
-unset SDC_AWS_SLACK_TOKEN
-unset SDC_AWS_SLACK_CHANNEL
-
 # Docker environment variables
 SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
 
@@ -93,7 +85,6 @@ else
     SDC_AWS_ALLOW_DELETE=""
 fi
 
-
 # Print all the environment variables
 echo "SDC_AWS_S3_BUCKET: $SDC_AWS_S3_BUCKET"
 echo "SDC_AWS_CONCURRENCY_LIMIT: $SDC_AWS_CONCURRENCY_LIMIT"
@@ -104,7 +95,7 @@ echo "SDC_AWS_SLACK_CHANNEL: $SDC_AWS_SLACK_CHANNEL"
 echo "SDC_AWS_ALLOW_DELETE: $SDC_AWS_ALLOW_DELETE"
 
 # Run the docker container
-docker run -it \
+docker run -d \
     --name $CONTAINER_NAME \
     -e SDC_AWS_S3_BUCKET="$SDC_AWS_S3_BUCKET" \
     -e SDC_AWS_CONCURRENCY_LIMIT="$SDC_AWS_CONCURRENCY_LIMIT" \
@@ -118,3 +109,12 @@ docker run -it \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
     $IMAGE_NAME
+
+# Unset all the environment variables
+unset SDC_AWS_S3_BUCKET
+unset SDC_AWS_CONCURRENCY_LIMIT
+unset SDC_AWS_TIMESTREAM_DB
+unset SDC_AWS_TIMESTREAM_TABLE
+unset SDC_AWS_SLACK_TOKEN
+unset SDC_AWS_SLACK_CHANNEL
+unset SDC_AWS_ALLOW_DELETE
