@@ -1,45 +1,13 @@
 #! /bin/bash
-
 # Script to build and run the fswatcher docker container
 
-# Container name
-CONTAINER_NAME=fswatcher
-
-# Image name
-IMAGE_NAME=fswatcher
-
-# S3 bucket name
-S3_BUCKET_NAME=swsoc-unsorted
-
-# Filepath to the directory to be watched
-WATCH_DIR=~/watch_directory
+source fswatcher.env
 
 # Verify that the directory to be watched exists
 if [ ! -d "$WATCH_DIR" ]; then
     echo "Directory $WATCH_DIR does not exist"
     exit 1
 fi
-
-# Concurrency limit
-CONCURRENCY_LIMIT=10
-
-# AWS region
-AWS_REGION="us-east-1"
-
-# TimeStream database name (optional)
-TIMESTREAM_DB=""
-
-# TimeStream table name (optional)
-TIMESTREAM_TABLE=""
-
-# Slack token (optional)
-SLACK_TOKEN=""
-
-# Slack channel (optional)
-SLACK_CHANNEL=""
-
-# Get path of current working directory (where the script is located)
-SCRIPT_PATH=$(pwd)
 
 # If the script is not located in the scripts directory, then change the path to the scripts directory
 if [ "$(basename $SCRIPT_PATH)" != "scripts" ]; then
