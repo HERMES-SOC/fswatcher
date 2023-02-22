@@ -482,6 +482,10 @@ class FileSystemHandler(FileSystemEventHandler):
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
+
+        # Change date_filter from datetime to match modified time
+        date_filter = datetime.timestamp(date_filter)
+
         if os.path.getmtime(file) > date_filter:
             return True
         return False
