@@ -45,28 +45,28 @@ SDC_AWS_S3_BUCKET="-b $S3_BUCKET_NAME"
 SDC_AWS_CONCURRENCY_LIMIT="-c $CONCURRENCY_LIMIT"
 
 # If TimeStream database name is not "", then add it to the environment variables
-if [ ! -z ${TIMESTREAM_DB+x} ]; then
+if [ -z ${TIMESTREAM_DB+x} ]; then
     SDC_AWS_TIMESTREAM_DB="-t $TIMESTREAM_DB"
 else
     SDC_AWS_TIMESTREAM_DB=""
 fi
 
 # If Timestream table name is not "", then add it to the environment variables
-if [ ! -z ${TIMESTREAM_TABLE+x} ]; then
+if [ -z ${TIMESTREAM_TABLE+x} ]; then
     SDC_AWS_TIMESTREAM_TABLE="-tt $TIMESTREAM_TABLE"
 else
     SDC_AWS_TIMESTREAM_TABLE=""
 fi
 
 # If Slack token is not "", then add it to the environment variables else make it empty
-if [ ! -z ${SLACK_TOKEN+x} ]; then
+if [ -z ${SLACK_TOKEN+x} ]; then
     SDC_AWS_SLACK_TOKEN="-s $SLACK_TOKEN"
 else
     SDC_AWS_SLACK_TOKEN=""
 fi
 
 # If Slack channel is not "", then add it to the environment variables else make it empty
-if [ ! -z ${SLACK_CHANNEL+x} ]; then
+if [ -z ${SLACK_CHANNEL+x} ]; then
     SDC_AWS_SLACK_CHANNEL="-c $SLACK_CHANNEL"
 else
     SDC_AWS_SLACK_CHANNEL=""
