@@ -1,4 +1,3 @@
-boto3 
-pyyaml
-watchdog
-slack_sdk
+boto3==1.26.35
+watchdog==2.2.0
+slack_sdk==3.19.5
