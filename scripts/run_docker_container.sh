@@ -1,7 +1,8 @@
 #! /bin/bash
 
-# Script to build and run the fswatcher docker container
+# Script to build and run the FSWatcher docker container
 
+# Get variables
 source fswatcher.config
 
 # Verify that the directory to be watched exists
@@ -24,24 +25,8 @@ DOCKERFILE_PATH=$(dirname $SCRIPT_PATH)
 # Print Dockerfile path
 echo "Dockerfile path: $DOCKERFILE_PATH"
 
-# Remove the docker image if it already exists
-if [ "$(docker images -q $IMAGE_NAME)" ]; then
-    echo "Removing existing image $IMAGE_NAME"
-    docker rmi $IMAGE_NAME
-fi
-
-# Stop the docker container if it is already running
-if [ "$(docker ps | grep $CONTAINER_NAME)" ]; then
-    echo "Stopping existing container $CONTAINER_NAME"
-    docker stop $CONTAINER_NAME
-fi
-
-# Remove the docker container if it already exists
-if [ "$(docker ps -a | grep $CONTAINER_NAME)" ]; then
-    echo "Removing existing container $CONTAINER_NAME"
-    docker rm $CONTAINER_NAME
-fi
-
+# Stop the docker container using the stop_docker_container.sh script
+$SCRIPT_PATH/stop_docker_container.sh
 
 # Build the docker image
 echo "Building docker image $IMAGE_NAME"
@@ -122,6 +107,7 @@ if [ "$FILE_LOGGING" = true ]; then
 fi
 
 # Print all the environment variables
+echo "Passed Arguments:"
 echo "SDC_AWS_S3_BUCKET: $SDC_AWS_S3_BUCKET"
 echo "SDC_AWS_CONCURRENCY_LIMIT: $SDC_AWS_CONCURRENCY_LIMIT"
 echo "SDC_AWS_TIMESTREAM_DB: $SDC_AWS_TIMESTREAM_DB"
@@ -135,7 +121,7 @@ echo "BACKTRACK: $BACKTRACK"
 echo "BACKTRACK_DATE: $BACKTRACK_DATE"
 
 # Run the docker container
-docker run -it \
+docker run -d \
     --name $CONTAINER_NAME \
     -e SDC_AWS_S3_BUCKET="$SDC_AWS_S3_BUCKET" \
     -e SDC_AWS_CONCURRENCY_LIMIT="$SDC_AWS_CONCURRENCY_LIMIT" \
@@ -152,3 +138,11 @@ docker run -it \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
     $IMAGE_NAME
+
+# Print the docker logs
+echo "Docker logs"
+
+# Docker ps
+docker ps
+
+# Path: scripts/run_docker_container.sh

@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 setup(
@@ -8,7 +8,7 @@ setup(
     author="Damian Barrous-Dume",
     packages=["fswatcher"],
     include_package_data=True,
-    install_requires=["watchdog", "boto3", "pyyaml", "slack_sdk"],
+    install_requires=["watchdog==2.2.0", "boto3==1.26.35", "slack_sdk==3.19.5"],
     entry_points={
         "console_scripts": [
             "fswatcher = fswatcher.fswatcher:main",

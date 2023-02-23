@@ -307,17 +307,30 @@ class FileSystemHandler(FileSystemEventHandler):
         Function to Upload a file to an S3 Bucket
         """
         log.info(f"Object ({file_key}) - Uploading file to S3 Bucket ({bucket_name})")
+
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in bucket_name:
+            bucket_name, folder = bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+            upload_file_key = f"{folder}{file_key}"
+        else:
+            upload_file_key = file_key
+            folder = ""
+
         try:
             # Upload to S3 Bucket
             self.s3t.upload(
                 src_path,
                 bucket_name,
-                file_key,
+                upload_file_key,
                 extra_args={"Tagging": tags},
             )
 
+            if folder != "" and folder[0] != "/":
+                folder = f"/{folder}"
             log.info(
-                f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name})"
+                f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name}{folder})"
             )
 
         except botocore.exceptions.ClientError as e:
@@ -336,15 +349,25 @@ class FileSystemHandler(FileSystemEventHandler):
         Function to Delete a file from an S3 Bucket
         """
         log.info(f"Object ({file_key}) - Deleting file from S3 Bucket ({bucket_name})")
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in bucket_name:
+            bucket_name, folder = bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+            delete_file_key = f"{folder}{file_key}"
+        else:
+            delete_file_key = file_key
+            folder = ""
         try:
             # Delete from S3 Bucket
             self.s3t.delete(
                 bucket_name,
-                file_key,
+                delete_file_key,
             )
-
+            if folder != "" and folder[0] != "/":
+                folder = f"/{folder}"
             log.info(
-                f"Object ({file_key}) - Successfully Deleted from S3 Bucket ({bucket_name})"
+                f"Object ({file_key}) - Successfully Deleted from S3 Bucket ({bucket_name}{folder})"
             )
 
         except botocore.exceptions.ClientError as e:
@@ -506,7 +529,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 )
                 self._log(
                     boto3_session=self.boto3_session,
-                    action_type="upload",
+                    action_type="PUT",
                     file_key=file_key,
                     source_bucket=self.base_path,
                     destination_bucket=bucket_name,
