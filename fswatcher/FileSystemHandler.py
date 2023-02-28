@@ -605,7 +605,7 @@ class FileSystemHandler(FileSystemEventHandler):
         # Delete the file from S3
         self._delete_from_s3_bucket(
             self.bucket_name,
-            test_filename,
+            test_file,
         )
 
         # Check if the file exists in S3 using s3 client
