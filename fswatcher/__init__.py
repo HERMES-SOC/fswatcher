@@ -15,12 +15,16 @@ if os.environ.get("FILE_LOGGING") == "true":
     file_handler.setLevel(logging.INFO)
 
     # Create formatter and add it to the handlers
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     file_handler.setFormatter(formatter)
 
     # Add the handlers to the logger
     log.addHandler(file_handler)
 
 # Configure boto3 logging to debug
-boto3_log = logging.getLogger("boto3")
-boto3_log.setLevel(logging.DEBUG)
+if os.environ.get("BOTO3_LOGGING") == "true":
+    log.info("Boto3 logging enabled")
+    boto3_log = logging.getLogger("botocore")
+    boto3_log.setLevel(logging.DEBUG)

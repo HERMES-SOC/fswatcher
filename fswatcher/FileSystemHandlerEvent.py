@@ -58,7 +58,6 @@ class FileSystemHandlerEvent:
         elif isinstance(event, FileDeletedEvent):
             self.action_type = "DELETE"
 
-
     # String Representation of the Class
     def __repr__(self) -> str:
         """
