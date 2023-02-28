@@ -558,13 +558,18 @@ class FileSystemHandler(FileSystemEventHandler):
         # Create a file to test
         test_file = os.path.join(self.path, "fswatcher_test_file.txt")
         test_event = FileMovedEvent(test_file, test_file)
+        file_system_event = FileSystemHandlerEvent(
+            event=test_event,
+            watch_path=self.path,
+            bucket_name=self.bucket_name,
+        )
 
         # Create the file
         with open(test_file, "w") as f:
             f.write("This is a test file")
 
         # Generate tags
-        tags = self._generate_object_tags(test_event)
+        tags = self._generate_object_tags(file_system_event)
 
         # Upload the file to S3
         self._upload_to_s3_bucket(
