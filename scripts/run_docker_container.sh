@@ -122,7 +122,8 @@ echo "TEST_IAM_POLICY: $TEST_IAM_POLICY"
 echo "BACKTRACK: $BACKTRACK"
 echo "BACKTRACK_DATE: $BACKTRACK_DATE"
 
-# Run the docker container
+
+# Run the docker container in detached mode
 docker run -d \
     --name $CONTAINER_NAME \
     -e SDC_AWS_S3_BUCKET="$SDC_AWS_S3_BUCKET" \

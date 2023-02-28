@@ -123,6 +123,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         if os.getenv("TEST_IAM_POLICY") == "true":
             log.info("Performing Push/Remove Test Run")
+            self._test_iam_policy()
 
         log.info(f"Watching for file events in: {config.path}")
         if config.backtrack:
@@ -552,8 +553,8 @@ class FileSystemHandler(FileSystemEventHandler):
         date_string = f"{date_string} 00:00:00"
         return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
 
-    # Perform Configuration Test
-    def _test(self):
+    # Perform IAM Policy Configuration Test
+    def _test_iam_policy(self):
         # Create a file to test
         test_file = os.path.join(self.base_path, "fswatcher_test_file.txt")
         test_event = FileMovedEvent(test_file, test_file)
