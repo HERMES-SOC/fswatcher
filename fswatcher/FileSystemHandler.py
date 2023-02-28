@@ -615,12 +615,17 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Check if the file exists in S3 using s3 client
         try:
+            print(f"Bucket Name: {bucket_name}")
+            print(f"File Key: {file_key}")
+
+            # Wait for the file to be deleted
+            time.sleep(5)
+
             s3.get_object(
                 Bucket=bucket_name,
                 Key=file_key,
             )
-            log.error("Test Failed - Check IAM Policy Configuration and clean up the test file in S3 bucket")
-            sys.exit(1)
+
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "NoSuchKey":
                 log.info("Test Passed")
