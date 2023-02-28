@@ -18,7 +18,7 @@ from watchdog.events import (
     FileSystemEvent,
     FileClosedEvent,
     FileSystemEventHandler,
-    FileMovedEvent
+    FileMovedEvent,
 )
 from typing import List
 from fswatcher import log
@@ -92,7 +92,6 @@ class FileSystemHandler(FileSystemEventHandler):
         # Initialize the slack client
         if config.slack_token is not None:
             try:
-                
                 # Initialize the slack client
                 self.slack_client = WebClient(token=config.slack_token)
 
@@ -122,8 +121,11 @@ class FileSystemHandler(FileSystemEventHandler):
         # Path to watch
         self.path = config.path
 
-        log.info(f"Watching for file events in: {config.path}")
+        if os.getenv("TEST_IAM_POLICY") == "true":
+            log.info("Performing Push/Remove Test Run")
+            self._test_iam_policy()
 
+        log.info(f"Watching for file events in: {config.path}")
         if config.backtrack:
             log.info("Backtracking enabled")
             self._backtrack(config.path, self._parse_datetime(config.backtrack_date))
@@ -228,7 +230,6 @@ class FileSystemHandler(FileSystemEventHandler):
                     )
 
             elif event.action_type == "DELETE" and self.allow_delete:
-
                 # Delete from S3 Bucket if allowed
                 self._delete_from_s3_bucket(
                     bucket_name=event.bucket_name,
@@ -343,7 +344,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 slack_message=f"FSWatcher: Error uploading file to {bucket_name} - ({file_key}) :file_folder:",
                 alert_type="error",
             )
-    
+
     def _delete_from_s3_bucket(self, bucket_name, file_key):
         """
         Function to Delete a file from an S3 Bucket
@@ -508,7 +509,6 @@ class FileSystemHandler(FileSystemEventHandler):
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
-
         # Change date_filter from datetime to match modified time
         date_filter = datetime.timestamp(date_filter)
 
@@ -541,7 +541,6 @@ class FileSystemHandler(FileSystemEventHandler):
             event = FileMovedEvent(file, file)
             self.dispatch(event)
 
-
     # Backtrack the directory tree
     def _backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
@@ -550,6 +549,103 @@ class FileSystemHandler(FileSystemEventHandler):
     def _parse_datetime(self, date_string):
         if date_string is None or date_string == "":
             return None
-        date_string= date_string.replace("'", "")
+        date_string = date_string.replace("'", "")
         date_string = f"{date_string} 00:00:00"
         return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+    # Perform IAM Policy Configuration Test
+    def _test_iam_policy(self):
+        # Create a file to test
+        test_filename="fswatcher_test_file.txt"
+        test_file = os.path.join(self.path, test_filename)
+        test_event = FileMovedEvent(test_file, test_file)
+        file_system_event = FileSystemHandlerEvent(
+            event=test_event,
+            watch_path=self.path,
+            bucket_name=self.bucket_name,
+        )
+
+        # Create the file
+        with open(test_file, "w") as f:
+            f.write("This is a test file")
+
+        # Generate tags
+        tags = self._generate_object_tags(file_system_event)
+
+        # Upload the file to S3
+        self._upload_to_s3_bucket(
+            test_file,
+            self.bucket_name,
+            test_filename,
+            tags,
+        )
+
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in self.bucket_name:
+            bucket_name, folder = self.bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+            file_key = f"{folder}{test_filename}"
+        else:
+            file_key = test_filename
+            folder = ""
+
+        # Wait for the file to be deleted
+        log.info("Waiting for file to be added...")
+        time.sleep(5)
+        log.info(f"Bucket Name: {bucket_name}")
+        log.info(f"File Key: {file_key}")
+
+        # Check if the file exists in S3 using s3 client
+        s3 = self.boto3_session.client("s3")
+
+        try:
+            s3.get_object(
+                Bucket=bucket_name,
+                Key=file_key,
+            )
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "NoSuchKey":
+                log.error("Test Failed - Check IAM Policy Configuration")
+                sys.exit(1)
+            else:
+                log.error("Test Failed - Check IAM Policy Configuration")
+                sys.exit(1)
+
+        # Delete the file
+        os.remove(test_file)
+
+        if self.allow_delete:
+            # Delete the file from S3
+            self._delete_from_s3_bucket(
+                self.bucket_name,
+                test_filename,
+            )
+
+            # Check if the file exists in S3 using s3 client
+            try:
+                # Wait for the file to be deleted
+                log.info("Waiting for file to be deleted...")
+                time.sleep(5)
+
+                s3.get_object(
+                    Bucket=bucket_name,
+                    Key=file_key,
+                )
+
+                log.error(
+                    f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
+                )
+                sys.exit(1)
+
+            except botocore.exceptions.ClientError as e:
+                if e.response["Error"]["Code"] == "NoSuchKey":
+                    log.info("Test Passed - IAM Policy Configuration is correct")
+                else:
+                    log.error(
+                        f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
+                    )
+                    sys.exit(1)
+        else:
+            log.info("Test Passed - IAM Policy Configuration is correct")
+            log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")

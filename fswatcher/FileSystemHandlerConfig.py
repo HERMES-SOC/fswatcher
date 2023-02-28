@@ -25,7 +25,6 @@ class FileSystemHandlerConfig:
         slack_message: str = "",
         backtrack: bool = False,
         backtrack_date: str = "",
-
     ) -> None:
         """
         Class Constructor
@@ -151,6 +150,7 @@ def get_args(args: ArgumentParser) -> dict:
 
     # Return the arguments dictionary
     return args_dict
+
 
 def validate_config_dict(config: dict) -> bool:
     """

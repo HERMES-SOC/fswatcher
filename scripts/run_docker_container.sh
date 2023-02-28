@@ -117,10 +117,13 @@ echo "SDC_AWS_SLACK_CHANNEL: $SDC_AWS_SLACK_CHANNEL"
 echo "SDC_AWS_ALLOW_DELETE: $SDC_AWS_ALLOW_DELETE"
 echo "AWS_REGION: $AWS_REGION"
 echo "FILE_LOGGING: $FILE_LOGGING"
+echo "BOTO3_LOGGING: $BOTO3_LOGGING"
+echo "TEST_IAM_POLICY: $TEST_IAM_POLICY"
 echo "BACKTRACK: $BACKTRACK"
 echo "BACKTRACK_DATE: $BACKTRACK_DATE"
 
-# Run the docker container
+
+# Run the docker container in detached mode
 docker run -d \
     --name $CONTAINER_NAME \
     -e SDC_AWS_S3_BUCKET="$SDC_AWS_S3_BUCKET" \
@@ -134,6 +137,8 @@ docker run -d \
     -e SDC_AWS_BACKTRACK_DATE="$SDC_AWS_BACKTRACK_DATE" \
     -e AWS_REGION="$AWS_REGION" \
     -e FILE_LOGGING="$FILE_LOGGING" \
+    -e BOTO3_LOGGING="$BOTO3_LOGGING" \
+    -e TEST_IAM_POLICY="$TEST_IAM_POLICY" \
     -v /etc/passwd:/etc/passwd \
     -v $WATCH_DIR:/watch \
     -v ${HOME}/.aws/credentials:/root/.aws/credentials:ro \
