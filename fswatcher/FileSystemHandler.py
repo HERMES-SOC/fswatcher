@@ -556,7 +556,7 @@ class FileSystemHandler(FileSystemEventHandler):
     # Perform IAM Policy Configuration Test
     def _test_iam_policy(self):
         # Create a file to test
-        test_file = os.path.join(self.base_path, "fswatcher_test_file.txt")
+        test_file = os.path.join(self.path, "fswatcher_test_file.txt")
         test_event = FileMovedEvent(test_file, test_file)
 
         # Create the file
