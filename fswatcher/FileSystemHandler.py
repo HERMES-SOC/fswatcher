@@ -632,10 +632,14 @@ class FileSystemHandler(FileSystemEventHandler):
                 Key=file_key,
             )
 
+            log.error(
+                f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
+            )
+            sys.exit(1)
+
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "NoSuchKey":
-                log.info("Test Passed")
-                sys.exit(0)
+                log.info("Test Passed - IAM Policy Configuration is correct")
             else:
                 log.error(
                     f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
