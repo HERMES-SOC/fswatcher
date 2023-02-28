@@ -615,33 +615,37 @@ class FileSystemHandler(FileSystemEventHandler):
         # Delete the file
         os.remove(test_file)
 
-        # Delete the file from S3
-        self._delete_from_s3_bucket(
-            self.bucket_name,
-            test_filename,
-        )
-
-        # Check if the file exists in S3 using s3 client
-        try:
-            # Wait for the file to be deleted
-            log.info("Waiting for file to be deleted...")
-            time.sleep(5)
-
-            s3.get_object(
-                Bucket=bucket_name,
-                Key=file_key,
+        if self.allow_delete:
+            # Delete the file from S3
+            self._delete_from_s3_bucket(
+                self.bucket_name,
+                test_filename,
             )
 
-            log.error(
-                f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
-            )
-            sys.exit(1)
+            # Check if the file exists in S3 using s3 client
+            try:
+                # Wait for the file to be deleted
+                log.info("Waiting for file to be deleted...")
+                time.sleep(5)
 
-        except botocore.exceptions.ClientError as e:
-            if e.response["Error"]["Code"] == "NoSuchKey":
-                log.info("Test Passed - IAM Policy Configuration is correct")
-            else:
+                s3.get_object(
+                    Bucket=bucket_name,
+                    Key=file_key,
+                )
+
                 log.error(
                     f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
                 )
                 sys.exit(1)
+
+            except botocore.exceptions.ClientError as e:
+                if e.response["Error"]["Code"] == "NoSuchKey":
+                    log.info("Test Passed - IAM Policy Configuration is correct")
+                else:
+                    log.error(
+                        f"Test Failed - Check IAM Policy Configuration, also clean up the test file in S3 bucket ({self.bucket_name})"
+                    )
+                    sys.exit(1)
+        else:
+            log.info("Test Passed - IAM Policy Configuration is correct")
+            log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")
