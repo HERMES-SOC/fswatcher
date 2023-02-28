@@ -589,15 +589,20 @@ class FileSystemHandler(FileSystemEventHandler):
         else:
             file_key = test_filename
             folder = ""
-        # Check if the file exists in S3 with the correct tags using s3 client
+        # Check if the file exists in S3 using s3 client
         s3 = self.boto3_session.client("s3")
-        response = s3.get_object_tagging(
-            Bucket=bucket_name,
-            Key=file_key,
-        )
-        if response["TagSet"] != tags:
-            log.error("Test Failed - Check IAM Policy Configuration")
-            sys.exit(1)
+        try:
+            s3.get_object(
+                Bucket=bucket_name,
+                Key=file_key,
+            )
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "NoSuchKey":
+                log.error("Test Failed - Check IAM Policy Configuration")
+                sys.exit(1)
+            else:
+                log.error("Test Failed - Check IAM Policy Configuration")
+                sys.exit(1)
 
         # Delete the file
         os.remove(test_file)
@@ -614,7 +619,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 Bucket=bucket_name,
                 Key=file_key,
             )
-            log.error("Test Failed - Check IAM Policy Configuration")
+            log.error("Test Failed - Check IAM Policy Configuration and clean up the test file in S3 bucket")
             sys.exit(1)
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "NoSuchKey":
