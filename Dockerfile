@@ -5,7 +5,7 @@ FROM python:3.11
 
 # Install Curl & Unzip
 RUN apt-get update  && \
-    apt-get install --no-install-recommends -y curl=7.74.0-1.3+deb11u5 unzip=6.0-26+deb11u1 && \
+    apt-get install --no-install-recommends -y curl unzip && \
     # Clean up
     rm -rf /var/lib/apt/lists/*
 
