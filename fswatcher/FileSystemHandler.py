@@ -556,7 +556,8 @@ class FileSystemHandler(FileSystemEventHandler):
     # Perform IAM Policy Configuration Test
     def _test_iam_policy(self):
         # Create a file to test
-        test_file = os.path.join(self.path, "fswatcher_test_file.txt")
+        test_filename="fswatcher_test_file.txt"
+        test_file = os.path.join(self.path, test_filename)
         test_event = FileMovedEvent(test_file, test_file)
         file_system_event = FileSystemHandlerEvent(
             event=test_event,
@@ -575,15 +576,24 @@ class FileSystemHandler(FileSystemEventHandler):
         self._upload_to_s3_bucket(
             test_file,
             self.bucket_name,
-            "test_file.txt",
+            test_filename,
             tags,
         )
 
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in self.bucket_name:
+            bucket_name, folder = self.bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+            file_key = f"{folder}{test_filename}"
+        else:
+            file_key = test_filename
+            folder = ""
         # Check if the file exists in S3 with the correct tags using s3 client
         s3 = self.boto3_session.client("s3")
         response = s3.get_object_tagging(
-            Bucket=self.bucket_name,
-            Key="test_file.txt",
+            Bucket=bucket_name,
+            Key=file_key,
         )
         if response["TagSet"] != tags:
             log.error("Test Failed - Check IAM Policy Configuration")
@@ -595,14 +605,14 @@ class FileSystemHandler(FileSystemEventHandler):
         # Delete the file from S3
         self._delete_from_s3_bucket(
             self.bucket_name,
-            "test_file.txt",
+            test_filename,
         )
 
         # Check if the file exists in S3 using s3 client
         try:
             s3.get_object(
-                Bucket=self.bucket_name,
-                Key="test_file.txt",
+                Bucket=bucket_name,
+                Key=file_key,
             )
             log.error("Test Failed - Check IAM Policy Configuration")
             sys.exit(1)
