@@ -589,8 +589,13 @@ class FileSystemHandler(FileSystemEventHandler):
         else:
             file_key = test_filename
             folder = ""
+
+        log.info(f"Bucket Name: {bucket_name}")
+        log.info(f"File Key: {file_key}")
+
         # Check if the file exists in S3 using s3 client
         s3 = self.boto3_session.client("s3")
+
         try:
             s3.get_object(
                 Bucket=bucket_name,
@@ -615,9 +620,6 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Check if the file exists in S3 using s3 client
         try:
-            print(f"Bucket Name: {bucket_name}")
-            print(f"File Key: {file_key}")
-
             # Wait for the file to be deleted
             time.sleep(5)
 
