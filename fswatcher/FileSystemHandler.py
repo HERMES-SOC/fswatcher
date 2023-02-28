@@ -590,6 +590,9 @@ class FileSystemHandler(FileSystemEventHandler):
             file_key = test_filename
             folder = ""
 
+        # Wait for the file to be deleted
+        log.info("Waiting for file to be added...")
+        time.sleep(5)
         log.info(f"Bucket Name: {bucket_name}")
         log.info(f"File Key: {file_key}")
 
@@ -621,6 +624,7 @@ class FileSystemHandler(FileSystemEventHandler):
         # Check if the file exists in S3 using s3 client
         try:
             # Wait for the file to be deleted
+            log.info("Waiting for file to be deleted...")
             time.sleep(5)
 
             s3.get_object(
