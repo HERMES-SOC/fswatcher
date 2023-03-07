@@ -3,7 +3,7 @@ Main File for the AWS File System Watcher
 """
 
 import time
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver as Observer
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
