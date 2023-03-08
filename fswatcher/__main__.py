@@ -35,7 +35,7 @@ def main() -> None:
         # If inotify fails, use the polling observer
         logging.warning("Inotify failed, falling back to polling observer")
         try:
-            observer = Observer()
+            observer = PollingObserver()
             observer.schedule(event_handler, config.path, recursive=True)
             observer.start()
             logging.info(f"Watching for file events in: {config.path}")
