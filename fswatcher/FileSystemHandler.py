@@ -9,7 +9,7 @@ from datetime import datetime
 from urllib import parse
 import boto3
 import botocore
-import boto3.s3.transfer as s3transfer
+from boto3.s3.transfer import TransferConfig, S3Transfer
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
@@ -60,11 +60,11 @@ class FileSystemHandler(FileSystemEventHandler):
                 max_pool_connections=self.concurrency_limit
             )
             s3client = self.boto3_session.client("s3", config=botocore_config)
-            transfer_config = s3transfer.TransferConfig(
+            transfer_config = TransferConfig(
                 use_threads=True,
                 max_concurrency=self.concurrency_limit,
             )
-            self.s3t = s3transfer.create_transfer_manager(s3client, transfer_config)
+            self.s3t = S3Transfer(s3client, transfer_config)
 
         except botocore.exceptions.ClientError as e:
             # If a client error is thrown, then check that it was a 404 error.
@@ -651,3 +651,7 @@ class FileSystemHandler(FileSystemEventHandler):
         else:
             log.info("Test Passed - IAM Policy Configuration is correct")
             log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")
+
+    def callback():
+        # Print the current time
+        log.info(f"Uploaded on Time: {datetime.now()}")
