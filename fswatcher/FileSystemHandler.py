@@ -321,7 +321,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             # Upload to S3 Bucket
-            result = self.s3t.upload(
+            result = self.s3t.upload_file(
                 src_path,
                 bucket_name,
                 upload_file_key,
@@ -362,7 +362,7 @@ class FileSystemHandler(FileSystemEventHandler):
             folder = ""
         try:
             # Delete from S3 Bucket
-            self.s3t.delete(
+            self.s3t.download_file(
                 bucket_name,
                 delete_file_key,
             )
