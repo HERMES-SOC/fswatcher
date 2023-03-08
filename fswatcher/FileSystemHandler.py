@@ -321,7 +321,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             # Upload to S3 Bucket
-            self.s3t.upload(
+            result = self.s3t.upload(
                 src_path,
                 bucket_name,
                 upload_file_key,
@@ -333,6 +333,7 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info(
                 f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name}{folder})"
             )
+            print(result)
 
         except botocore.exceptions.ClientError as e:
             log.error(
