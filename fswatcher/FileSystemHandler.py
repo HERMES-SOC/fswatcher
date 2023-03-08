@@ -333,7 +333,7 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info(
                 f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name}{folder})"
             )
-            log.info(result)
+            log.info('result: %s', result)
 
         except botocore.exceptions.ClientError as e:
             log.error(
