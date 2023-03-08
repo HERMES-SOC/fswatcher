@@ -125,10 +125,10 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info("Performing Push/Remove Test Run")
             self._test_iam_policy()
 
-        log.info(f"Watching for file events in: {config.path}")
         if config.backtrack:
-            log.info("Backtracking enabled")
+            log.info("Backtracking enabled, backtracking (This might take awhile if a large amount of directories and files)...")
             self._backtrack(config.path, self._parse_datetime(config.backtrack_date))
+            log.info("Backtracking complete")
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
@@ -268,7 +268,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to generate object tags and return as a url encoded string
         """
-        log.info(f"Object ({event.get_parsed_path()}) - Generating S3 Object Tags")
+        log.debug(f"Object ({event.get_parsed_path()}) - Generating S3 Object Tags")
         try:
             # Get Object Stats
             object_stats = os.stat(event.get_path())
@@ -294,7 +294,7 @@ class FileSystemHandler(FileSystemEventHandler):
                     tags[stat] = object_stats.__getattribute__(stat)
 
             # Log Object Creation and Modification Times
-            log.info(f"Object ({event.get_parsed_path()}) - Stats: {tags}")
+            log.debug(f"Object ({event.get_parsed_path()}) - Stats: {tags}")
 
             return parse.urlencode(tags)
 
@@ -307,7 +307,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Upload a file to an S3 Bucket
         """
-        log.info(f"Object ({file_key}) - Uploading file to S3 Bucket ({bucket_name})")
+        log.debug(f"Object ({file_key}) - Uploading file to S3 Bucket ({bucket_name})")
 
         # If bucket name includes directories remove them from bucket_name and append to the file_key
         if "/" in bucket_name:
@@ -349,7 +349,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Delete a file from an S3 Bucket
         """
-        log.info(f"Object ({file_key}) - Deleting file from S3 Bucket ({bucket_name})")
+        log.debug(f"Object ({file_key}) - Deleting file from S3 Bucket ({bucket_name})")
         # If bucket name includes directories remove them from bucket_name and append to the file_key
         if "/" in bucket_name:
             bucket_name, folder = bucket_name.split("/", 1)
@@ -392,7 +392,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to send a Slack Notification
         """
-        log.info(f"Sending Slack Notification to {slack_channel}")
+        log.debug(f"Sending Slack Notification to {slack_channel}")
         try:
             color = {
                 "success": "#3498db",
@@ -438,7 +438,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Log to Timestream
         """
-        log.info(f"Object ({new_file_key}) - Logging Event to Timestream")
+        log.debug(f"Object ({new_file_key}) - Logging Event to Timestream")
         CURRENT_TIME = str(int(time.time() * 1000))
         try:
             # Initialize Timestream Client
@@ -483,7 +483,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 ],
             )
 
-            log.info(
+            log.debug(
                 (f"Object ({new_file_key}) - Event Successfully Logged to Timestream")
             )
 

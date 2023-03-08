@@ -25,16 +25,19 @@ def main() -> None:
     # Try to use the inotify observer
     try:
         # Initialize the Observer and start watching
+        logging.info("Starting observer")
         observer = Observer()
         observer.schedule(event_handler, config.path, recursive=True)
         observer.start()
+        logging.info(f"Watching for file events in: {config.path}")
 
     except OSError:
         # If inotify fails, use the polling observer
-        logging.warning("Inotify failed, falling back to polling observer")
+        logging.warning("Inotify Observer failed, falling back to polling observer")
         observer = PollingObserver()
         observer.schedule(event_handler, config.path, recursive=True)
         observer.start()
+        logging.info(f"Watching for file events in: {config.path}")
 
     try:
         while True:
