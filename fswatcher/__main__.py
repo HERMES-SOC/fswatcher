@@ -3,6 +3,7 @@ Main File for the AWS File System Watcher
 """
 
 import time
+import logging
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 from fswatcher.FileSystemHandler import FileSystemHandler
@@ -30,6 +31,7 @@ def main() -> None:
 
     except OSError:
         # If inotify fails, use the polling observer
+        logging.warning("Inotify failed, falling back to polling observer")
         observer = PollingObserver()
         observer.schedule(event_handler, config.path, recursive=True)
         observer.start()
