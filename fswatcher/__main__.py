@@ -4,6 +4,7 @@ Main File for the AWS File System Watcher
 
 import time
 from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
@@ -20,10 +21,18 @@ def main() -> None:
     # Initialize the FileSystemHandler
     event_handler = FileSystemHandler(config=config)
 
-    # Initialize the Observer and start watching
-    observer = Observer()
-    observer.schedule(event_handler, config.path, recursive=True)
-    observer.start()
+    # Try to use the inotify observer
+    try:
+        # Initialize the Observer and start watching
+        observer = Observer()
+        observer.schedule(event_handler, config.path, recursive=True)
+        observer.start()
+
+    except OSError:
+        # If inotify fails, use the polling observer
+        observer = PollingObserver()
+        observer.schedule(event_handler, config.path, recursive=True)
+        observer.start()
 
     try:
         while True:
