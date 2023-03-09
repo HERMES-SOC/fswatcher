@@ -30,6 +30,7 @@ class FileSystemHandler(FileSystemEventHandler):
     """
 
     events: List[FileSystemHandlerEvent] = []
+    dead_letter_queue: List[dict] = []
 
     def __init__(
         self,
@@ -321,7 +322,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             # Upload to S3 Bucket
-            result = self.s3t.upload_file(
+            self.s3t.upload_file(
                 src_path,
                 bucket_name,
                 upload_file_key,
@@ -333,7 +334,17 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info(
                 f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name}{folder})"
             )
-            log.info('result: %s', result)
+
+        except boto3.exceptions.RetriesExceededError:
+            log.error(
+                {
+                    "status": "ERROR",
+                    "message": f"Error uploading to S3 Bucket ({bucket_name}): Retries Exceeded",
+                }
+            )
+            time.sleep(5)
+            self.dead_letter_queue.append({"src_path": src_path, "bucket_name": bucket_name, "file_key": file_key, "tags": tags})
+            print(self.dead_letter_queue)
 
         except botocore.exceptions.ClientError as e:
             log.error(
