@@ -9,6 +9,11 @@ from watchdog.observers.polling import PollingObserver
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
+# Configure logging
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 # Main Function
 def main() -> None:

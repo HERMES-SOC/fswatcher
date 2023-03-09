@@ -5,7 +5,10 @@ import os
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 log = logging.getLogger(__name__)
 
 # Create log file handler if file log environment variable is set
