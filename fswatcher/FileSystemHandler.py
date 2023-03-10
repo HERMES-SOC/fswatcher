@@ -508,6 +508,7 @@ class FileSystemHandler(FileSystemEventHandler):
     def _get_files(self, path, date_filter=None):
         import glob
         start = time.time()
+        print(date_filter)
         if date_filter:
             files = [
                 file
@@ -516,7 +517,8 @@ class FileSystemHandler(FileSystemEventHandler):
                 and self._check_date(file, date_filter)
             ]
         else:
-            files = [file for file in glob.iglob(f"{path}/**", recursive=True) if os.path.isfile(file)]
+            files = files = glob.glob(path + '/**/*.*', recursive=True)
+
         end = time.time()
         log.info(
             f"Found {len(files)} files in {path} in {round(end - start, 2)} seconds"
