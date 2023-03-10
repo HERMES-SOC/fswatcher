@@ -122,20 +122,25 @@ class FileSystemHandler(FileSystemEventHandler):
         # Path to watch
         self.path = config.path
 
+        # Initialize the backtrack flag
+        self.backtrack = config.backtrack
+        self.backtrack_date = config.backtrack_date
+
         if os.getenv("TEST_IAM_POLICY") == "true":
             log.info("Performing Push/Remove Test Run")
             self._test_iam_policy()
-
-        if config.backtrack:
-            log.info("Backtracking enabled, backtracking (This might take awhile if a large amount of directories and files)...")
-            self._backtrack(config.path, self._parse_datetime(config.backtrack_date))
-            log.info("Backtracking complete")
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """
         Overloaded Function to deal with any event
         """
-
+        # Check if we need to backtrack
+        if self.backtrack:
+            log.info("Backtracking enabled, backtracking (This might take awhile if a large amount of directories and files)...")
+            self._backtrack(self.path, self._parse_datetime(self.backtrack_date))
+            log.info("Backtracking complete")
+            self.backtrack = False
+            
         # Filter the event
         filtered_event = self._filter_event(event)
 
@@ -559,6 +564,7 @@ class FileSystemHandler(FileSystemEventHandler):
     # Backtrack the directory tree
     def _backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
+        self.
 
     # Parse datetime from string
     def _parse_datetime(self, date_string):
@@ -665,7 +671,3 @@ class FileSystemHandler(FileSystemEventHandler):
         else:
             log.info("Test Passed - IAM Policy Configuration is correct")
             log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")
-
-    def callback():
-        # Print the current time
-        log.info(f"Uploaded on Time: {datetime.now()}")
