@@ -37,9 +37,10 @@ def main() -> None:
         observer.start()
         # If backtrack is enabled, run the initial scan
         if config.backtrack:
-            # Dispatch an empty event to trigger the initial scan
-            event_handler.dispatch(None)
-            
+            logging.info("Backtracking enabled, backtracking (This might take awhile if a large amount of directories and files)...")
+            event_handler.backtrack(config.path, event_handler.parse_datetime(config.backtrack_date))
+            logging.info("Backtracking complete")
+            config.backtrack = False
         logging.info(f"Watching for file events with INotify Observer in: {config.path}")
 
     except OSError:

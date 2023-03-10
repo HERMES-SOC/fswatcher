@@ -122,10 +122,6 @@ class FileSystemHandler(FileSystemEventHandler):
         # Path to watch
         self.path = config.path
 
-        # Initialize the backtrack flag
-        self.backtrack = config.backtrack
-        self.backtrack_date = config.backtrack_date
-
         if os.getenv("TEST_IAM_POLICY") == "true":
             log.info("Performing Push/Remove Test Run")
             self._test_iam_policy()
@@ -134,13 +130,6 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Overloaded Function to deal with any event
         """
-        # Check if we need to backtrack
-        if self.backtrack:
-            log.info("Backtracking enabled, backtracking (This might take awhile if a large amount of directories and files)...")
-            self._backtrack(self.path, self._parse_datetime(self.backtrack_date))
-            log.info("Backtracking complete")
-            self.backtrack = False
-
         # Filter the event
         filtered_event = self._filter_event(event)
 
@@ -563,11 +552,11 @@ class FileSystemHandler(FileSystemEventHandler):
             self.dispatch(event)
 
     # Backtrack the directory tree
-    def _backtrack(self, path, date_filter=None):
+    def backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
 
     # Parse datetime from string
-    def _parse_datetime(self, date_string):
+    def parse_datetime(self, date_string):
         if date_string is None or date_string == "":
             return None
         date_string = date_string.replace("'", "")
