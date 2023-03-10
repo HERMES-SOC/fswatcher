@@ -547,7 +547,7 @@ class FileSystemHandler(FileSystemEventHandler):
             # Log the number of files that are not in S3
             log.info(f"Found {len(files)} files that are not in S3")
 
-        # return files
+        return files
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
