@@ -92,7 +92,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Check s3
         self.check_with_s3 = True
-        
+
         # Initialize the slack client
         if config.slack_token is not None:
             try:
@@ -528,7 +528,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
             # Log the number of files that are not in S3
             log.info(f"Found {len(files)} files that are not in S3")
-        return files
+        # return files
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
@@ -569,34 +569,22 @@ class FileSystemHandler(FileSystemEventHandler):
         self._dispatch_events(self._get_files(path, date_filter))
 
     # Get all of the keys in an S3 bucket and return them as a list also support pagination if required, use s3 client instead of s3t because s3t does not support pagination
-    def _get_s3_keys(self, bucket_name, prefix=None, suffix=None):
+    def _get_s3_keys(self, bucket_name):
         keys = []
         start_time = time.time()
         s3 = self.boto3_session.client("s3")
-        kwargs = {"Bucket": bucket_name}
-        if isinstance(prefix, str):
-            kwargs["Prefix"] = prefix
-
-        while True:
-            resp = s3.list_objects_v2(**kwargs)
-            for obj in resp.get("Contents", []):
-                key = obj["Key"]
-                if key.endswith(suffix):
-                    keys.append(key)
-
-            try:
-                kwargs["ContinuationToken"] = resp["NextContinuationToken"]
-            except KeyError:
-                break
-
+        paginator = s3.get_paginator("list_objects_v2")
+        page_iterator = paginator.paginate(Bucket=bucket_name)
+        for page in page_iterator:
+            if "Contents" in page:
+                for obj in page["Contents"]:
+                    keys.append(obj["Key"])
         end_time = time.time()
         log.info(
-            f"Found {len(keys)} files in {round(end_time - start_time, 2)} seconds"
+            f"Found {len(keys)} keys in {round(end_time - start_time, 2)} seconds"
         )
         return keys
-
-
-    # Parse datetime from string
+    
     def parse_datetime(self, date_string):
         if date_string is None or date_string == "":
             return None
