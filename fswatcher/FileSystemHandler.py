@@ -604,7 +604,7 @@ class FileSystemHandler(FileSystemEventHandler):
         for page in page_iterator:
             if "Contents" in page:
                 for obj in page["Contents"]:
-                    keys.append(obj["Key"])
+                    keys.append(f'/watch/{obj["Key"]}')
         end_time = time.time()
         log.info(f"Found {len(keys)} keys in {round(end_time - start_time, 2)} seconds")
         return keys
