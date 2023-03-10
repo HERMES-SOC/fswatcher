@@ -90,6 +90,9 @@ class FileSystemHandler(FileSystemEventHandler):
         # Initialize the timestream table
         self.timestream_table = config.timestream_table
 
+        # Check s3
+        self.check_with_s3 = True
+        
         # Initialize the slack client
         if config.slack_token is not None:
             try:
@@ -515,6 +518,16 @@ class FileSystemHandler(FileSystemEventHandler):
         log.info(
             f"Found {len(files)} files in {round(end_time - start_time, 2)} seconds"
         )
+
+        # If Check with S3 is enabled, call the function to get all keys and compare with the files
+        if self.check_with_s3:
+            keys = self._get_s3_keys(bucket_name=self.bucket_name)
+
+            # Remove files that are already in S3
+            files = [file for file in files if file not in keys]
+
+            # Log the number of files that are not in S3
+            log.info(f"Found {len(files)} files that are not in S3")
         return files
 
     # Check if the file is newer than the date filter
@@ -554,6 +567,34 @@ class FileSystemHandler(FileSystemEventHandler):
     # Backtrack the directory tree
     def backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
+
+    # Get all of the keys in an S3 bucket and return them as a list also support pagination if required, use s3 client instead of s3t because s3t does not support pagination
+    def _get_s3_keys(self, bucket_name, prefix=None, suffix=None):
+        keys = []
+        start_time = time.time()
+        s3 = self.boto3_session.client("s3")
+        kwargs = {"Bucket": bucket_name}
+        if isinstance(prefix, str):
+            kwargs["Prefix"] = prefix
+
+        while True:
+            resp = s3.list_objects_v2(**kwargs)
+            for obj in resp.get("Contents", []):
+                key = obj["Key"]
+                if key.endswith(suffix):
+                    keys.append(key)
+
+            try:
+                kwargs["ContinuationToken"] = resp["NextContinuationToken"]
+            except KeyError:
+                break
+
+        end_time = time.time()
+        log.info(
+            f"Found {len(keys)} files in {round(end_time - start_time, 2)} seconds"
+        )
+        return keys
+
 
     # Parse datetime from string
     def parse_datetime(self, date_string):
