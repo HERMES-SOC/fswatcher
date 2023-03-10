@@ -340,7 +340,14 @@ class FileSystemHandler(FileSystemEventHandler):
                 }
             )
             time.sleep(5)
-            self.dead_letter_queue.append({"src_path": src_path, "bucket_name": bucket_name, "file_key": file_key, "tags": tags})
+            self.dead_letter_queue.append(
+                {
+                    "src_path": src_path,
+                    "bucket_name": bucket_name,
+                    "file_key": file_key,
+                    "tags": tags,
+                }
+            )
             print(self.dead_letter_queue)
 
         except botocore.exceptions.ClientError as e:
@@ -521,13 +528,18 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # If Check with S3 is enabled, call the function to get all keys and compare with the files
         if self.check_with_s3:
+            log.info("Checking files with S3 (This may take a while) ...")
+
             keys = self._get_s3_keys(bucket_name=self.bucket_name)
 
+            log.info("Now comparing files with S3 keys ...")
+
             # Remove files that are already in S3
-            files = [file for file in files if file not in keys]
+            files = list(set(files) - set(keys))
 
             # Log the number of files that are not in S3
             log.info(f"Found {len(files)} files that are not in S3")
+
         # return files
 
     # Check if the file is newer than the date filter
@@ -574,17 +586,25 @@ class FileSystemHandler(FileSystemEventHandler):
         start_time = time.time()
         s3 = self.boto3_session.client("s3")
         paginator = s3.get_paginator("list_objects_v2")
-        page_iterator = paginator.paginate(Bucket=bucket_name)
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in bucket_name:
+            bucket_name, folder = bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+        else:
+            folder = ""
+
+        operation_parameters = {"Bucket": bucket_name, "Prefix": folder}
+        page_iterator = paginator.paginate(**operation_parameters)
+
         for page in page_iterator:
             if "Contents" in page:
                 for obj in page["Contents"]:
                     keys.append(obj["Key"])
         end_time = time.time()
-        log.info(
-            f"Found {len(keys)} keys in {round(end_time - start_time, 2)} seconds"
-        )
+        log.info(f"Found {len(keys)} keys in {round(end_time - start_time, 2)} seconds")
         return keys
-    
+
     def parse_datetime(self, date_string):
         if date_string is None or date_string == "":
             return None
@@ -595,7 +615,7 @@ class FileSystemHandler(FileSystemEventHandler):
     # Perform IAM Policy Configuration Test
     def _test_iam_policy(self):
         # Create a file to test
-        test_filename="fswatcher_test_file.txt"
+        test_filename = "fswatcher_test_file.txt"
         test_file = os.path.join(self.path, test_filename)
         test_event = FileMovedEvent(test_file, test_file)
         file_system_event = FileSystemHandlerEvent(
@@ -688,4 +708,6 @@ class FileSystemHandler(FileSystemEventHandler):
                     sys.exit(1)
         else:
             log.info("Test Passed - IAM Policy Configuration is correct")
-            log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")
+            log.warning(
+                "Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually"
+            )
