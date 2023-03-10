@@ -504,25 +504,19 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
 
-    # Recursively get all file in the specified directory as a list with optional date filter (datetime) also print out how long it took to get the files and the number of files with glob
+    # Recursively get all file in the specified directory as a list with optional date filter (datetime) also print out how long it took to get the files and the number of files the faster the better
     def _get_files(self, path, date_filter=None):
-        import glob
-        start = time.time()
-        print(date_filter)
-        if date_filter:
-            files = [
-                file
-                for file in glob.iglob(f"{path}/**", recursive=True)
-                if os.path.isfile(file)
-                and self._check_date(file, date_filter)
-            ]
-        else:
-            files = files = glob.glob(path + '/**/*.*', recursive=True)
-
-        end = time.time()
-        log.info(
-            f"Found {len(files)} files in {path} in {round(end - start, 2)} seconds"
-        )
+        files = []
+        # r=root, d=directories, f = files
+        for r, d, f in os.walk(path):
+            for file in f:
+                file_path = os.path.join(r, file)
+                if date_filter:
+                    if self._check_date(file_path, date_filter):
+                        files.append(file_path)
+                else:
+                    files.append(file_path)
+        return files
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
