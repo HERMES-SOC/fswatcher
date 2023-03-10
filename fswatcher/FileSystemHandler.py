@@ -140,7 +140,7 @@ class FileSystemHandler(FileSystemEventHandler):
             self._backtrack(self.path, self._parse_datetime(self.backtrack_date))
             log.info("Backtracking complete")
             self.backtrack = False
-            
+
         # Filter the event
         filtered_event = self._filter_event(event)
 
@@ -525,7 +525,7 @@ class FileSystemHandler(FileSystemEventHandler):
         log.info(
             f"Found {len(files)} files in {round(end_time - start_time, 2)} seconds"
         )
-        # return files
+        return files
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
