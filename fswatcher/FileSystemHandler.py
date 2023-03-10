@@ -9,7 +9,7 @@ from datetime import datetime
 from urllib import parse
 import boto3
 import botocore
-import boto3.s3.transfer as s3transfer
+from boto3.s3.transfer import TransferConfig, S3Transfer
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
@@ -30,6 +30,7 @@ class FileSystemHandler(FileSystemEventHandler):
     """
 
     events: List[FileSystemHandlerEvent] = []
+    dead_letter_queue: List[dict] = []
 
     def __init__(
         self,
@@ -60,11 +61,11 @@ class FileSystemHandler(FileSystemEventHandler):
                 max_pool_connections=self.concurrency_limit
             )
             s3client = self.boto3_session.client("s3", config=botocore_config)
-            transfer_config = s3transfer.TransferConfig(
+            transfer_config = TransferConfig(
                 use_threads=True,
                 max_concurrency=self.concurrency_limit,
             )
-            self.s3t = s3transfer.create_transfer_manager(s3client, transfer_config)
+            self.s3t = S3Transfer(s3client, transfer_config)
 
         except botocore.exceptions.ClientError as e:
             # If a client error is thrown, then check that it was a 404 error.
@@ -88,6 +89,12 @@ class FileSystemHandler(FileSystemEventHandler):
 
         # Initialize the timestream table
         self.timestream_table = config.timestream_table
+
+        # Check s3
+        if os.getenv("CHECK_S3") == "true":
+            self.check_with_s3 = True
+        else:
+            self.check_with_s3 = False
 
         # Initialize the slack client
         if config.slack_token is not None:
@@ -134,7 +141,6 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Overloaded Function to deal with any event
         """
-
         # Filter the event
         filtered_event = self._filter_event(event)
 
@@ -268,7 +274,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to generate object tags and return as a url encoded string
         """
-        log.info(f"Object ({event.get_parsed_path()}) - Generating S3 Object Tags")
+        log.debug(f"Object ({event.get_parsed_path()}) - Generating S3 Object Tags")
         try:
             # Get Object Stats
             object_stats = os.stat(event.get_path())
@@ -294,7 +300,7 @@ class FileSystemHandler(FileSystemEventHandler):
                     tags[stat] = object_stats.__getattribute__(stat)
 
             # Log Object Creation and Modification Times
-            log.info(f"Object ({event.get_parsed_path()}) - Stats: {tags}")
+            log.debug(f"Object ({event.get_parsed_path()}) - Stats: {tags}")
 
             return parse.urlencode(tags)
 
@@ -307,7 +313,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Upload a file to an S3 Bucket
         """
-        log.info(f"Object ({file_key}) - Uploading file to S3 Bucket ({bucket_name})")
+        log.debug(f"Object ({file_key}) - Uploading file to S3 Bucket ({bucket_name})")
 
         # If bucket name includes directories remove them from bucket_name and append to the file_key
         if "/" in bucket_name:
@@ -321,7 +327,7 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             # Upload to S3 Bucket
-            self.s3t.upload(
+            self.s3t.upload_file(
                 src_path,
                 bucket_name,
                 upload_file_key,
@@ -333,6 +339,24 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info(
                 f"Object ({file_key}) - Successfully Uploaded to S3 Bucket ({bucket_name}{folder})"
             )
+
+        except boto3.exceptions.RetriesExceededError:
+            log.error(
+                {
+                    "status": "ERROR",
+                    "message": f"Error uploading to S3 Bucket ({bucket_name}): Retries Exceeded",
+                }
+            )
+            time.sleep(5)
+            self.dead_letter_queue.append(
+                {
+                    "src_path": src_path,
+                    "bucket_name": bucket_name,
+                    "file_key": file_key,
+                    "tags": tags,
+                }
+            )
+            print(self.dead_letter_queue)
 
         except botocore.exceptions.ClientError as e:
             log.error(
@@ -349,7 +373,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Delete a file from an S3 Bucket
         """
-        log.info(f"Object ({file_key}) - Deleting file from S3 Bucket ({bucket_name})")
+        log.debug(f"Object ({file_key}) - Deleting file from S3 Bucket ({bucket_name})")
         # If bucket name includes directories remove them from bucket_name and append to the file_key
         if "/" in bucket_name:
             bucket_name, folder = bucket_name.split("/", 1)
@@ -361,7 +385,7 @@ class FileSystemHandler(FileSystemEventHandler):
             folder = ""
         try:
             # Delete from S3 Bucket
-            self.s3t.delete(
+            self.s3t.download_file(
                 bucket_name,
                 delete_file_key,
             )
@@ -392,7 +416,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to send a Slack Notification
         """
-        log.info(f"Sending Slack Notification to {slack_channel}")
+        log.debug(f"Sending Slack Notification to {slack_channel}")
         try:
             color = {
                 "success": "#3498db",
@@ -438,7 +462,7 @@ class FileSystemHandler(FileSystemEventHandler):
         """
         Function to Log to Timestream
         """
-        log.info(f"Object ({new_file_key}) - Logging Event to Timestream")
+        log.debug(f"Object ({new_file_key}) - Logging Event to Timestream")
         CURRENT_TIME = str(int(time.time() * 1000))
         try:
             # Initialize Timestream Client
@@ -483,7 +507,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 ],
             )
 
-            log.info(
+            log.debug(
                 (f"Object ({new_file_key}) - Event Successfully Logged to Timestream")
             )
 
@@ -492,19 +516,42 @@ class FileSystemHandler(FileSystemEventHandler):
                 {"status": "ERROR", "message": f"Error logging to Timestream: {e}"}
             )
 
-    # Recursively get all file in the specified directory as a list with optional date filter (datetime)
+    # Recursively get all file in the specified directory as a list with optional date filter (datetime) also print out how long it took to get the files and the number of files
     def _get_files(self, path, date_filter=None):
         files = []
-        for file in os.listdir(path):
-            file = os.path.join(path, file)
-            if os.path.isfile(file):
+        start_time = time.time()
+        for root, _, file in os.walk(path):
+            for f in file:
+                file_path = os.path.join(root, f)
                 if date_filter:
-                    if self._check_date(file, date_filter):
-                        files.append(file)
+                    if self._check_date(file_path, date_filter):
+                        files.append(file_path)
                 else:
-                    files.append(file)
-            elif os.path.isdir(file):
-                files.extend(self._get_files(file, date_filter))
+                    files.append(file_path)
+
+        end_time = time.time()
+        log.info(
+            f"Found {len(files)} files in {round(end_time - start_time, 2)} seconds"
+        )
+
+        # If Check with S3 is enabled, call the function to get all keys and compare with the files
+        if self.check_with_s3:
+            log.info("Checking files with S3 (This may take a while) ...")
+
+            keys = self._get_s3_keys(bucket_name=self.bucket_name)
+
+            log.info("Now comparing files with S3 keys ...")
+
+            # Remove files that are already in S3
+            files = list(set(files) - set(keys))
+            # Log the first 10 files
+            log.info(f"First 10 files: {files[:10]}")
+
+            # Log the first 10 keys
+            log.info(f"First 10 keys: {keys[:10]}")
+            # Log the number of files that are not in S3
+            log.info(f"Found {len(files)} files that are not in S3")
+
         return files
 
     # Check if the file is newer than the date filter
@@ -542,11 +589,35 @@ class FileSystemHandler(FileSystemEventHandler):
             self.dispatch(event)
 
     # Backtrack the directory tree
-    def _backtrack(self, path, date_filter=None):
+    def backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
 
-    # Parse datetime from string
-    def _parse_datetime(self, date_string):
+    # Get all of the keys in an S3 bucket and return them as a list also support pagination if required, use s3 client instead of s3t because s3t does not support pagination
+    def _get_s3_keys(self, bucket_name):
+        keys = []
+        start_time = time.time()
+        s3 = self.boto3_session.client("s3")
+        paginator = s3.get_paginator("list_objects_v2")
+        # If bucket name includes directories remove them from bucket_name and append to the file_key
+        if "/" in bucket_name:
+            bucket_name, folder = bucket_name.split("/", 1)
+            if folder != "" and folder[-1] != "/":
+                folder = f"{folder}/"
+        else:
+            folder = ""
+
+        operation_parameters = {"Bucket": bucket_name, "Prefix": folder}
+        page_iterator = paginator.paginate(**operation_parameters)
+
+        for page in page_iterator:
+            if "Contents" in page:
+                for obj in page["Contents"]:
+                    keys.append(f'/watch/{obj["Key"].replace(folder, "")}')
+        end_time = time.time()
+        log.info(f"Found {len(keys)} keys in {round(end_time - start_time, 2)} seconds")
+        return keys
+
+    def parse_datetime(self, date_string):
         if date_string is None or date_string == "":
             return None
         date_string = date_string.replace("'", "")
@@ -587,6 +658,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 folder = f"{folder}/"
             file_key = f"{folder}{test_filename}"
         else:
+            bucket_name = self.bucket_name
             file_key = test_filename
             folder = ""
 
@@ -648,4 +720,6 @@ class FileSystemHandler(FileSystemEventHandler):
                     sys.exit(1)
         else:
             log.info("Test Passed - IAM Policy Configuration is correct")
-            log.warning("Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually")
+            log.warning(
+                "Since allow_delete is set to False, the test file will not be deleted from S3, please delete it manually"
+            )
