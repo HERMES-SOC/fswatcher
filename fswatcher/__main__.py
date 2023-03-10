@@ -57,14 +57,11 @@ def main() -> None:
         logging.warning(
             "We suggest you increase the inotify limit for better performance, see: https://gist.github.com/coenraadhuman/fa7345e95a9b4dea851dbe9e8f011470"
         )
-        try:
-            observer = PollingObserver()
-            observer.schedule(event_handler, config.path, recursive=True)
-            observer.start()
-            logging.info(f"Watching for file events in: {config.path}")
-        except Exception as e:
-            logging.error(f"Failed to initialize observer: {e}")
-            sys.exit(0)
+        logging.warning(
+            "This is limited by your RAM, 1,000,000 Directory Watches per 1GB of RAM, see: https://unix.stackexchange.com/questions/13751/kernel-inotify-watch-limit-reached"
+        )
+        sys.exit(0)
+
     try:
         while True:
             time.sleep(1)
