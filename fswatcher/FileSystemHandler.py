@@ -521,6 +521,7 @@ class FileSystemHandler(FileSystemEventHandler):
                         files.append(file_path)
                 else:
                     files.append(file_path)
+
         end_time = time.time()
         log.info(
             f"Found {len(files)} files in {round(end_time - start_time, 2)} seconds"
@@ -564,7 +565,6 @@ class FileSystemHandler(FileSystemEventHandler):
     # Backtrack the directory tree
     def _backtrack(self, path, date_filter=None):
         self._dispatch_events(self._get_files(path, date_filter))
-        self.
 
     # Parse datetime from string
     def _parse_datetime(self, date_string):
