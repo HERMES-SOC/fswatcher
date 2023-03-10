@@ -93,7 +93,8 @@ class FileSystemHandler(FileSystemEventHandler):
         # Check s3
         if os.getenv("CHECK_S3") == "true":
             self.check_with_s3 = True
-
+        else:
+            self.check_with_s3 = False
 
         # Initialize the slack client
         if config.slack_token is not None:
