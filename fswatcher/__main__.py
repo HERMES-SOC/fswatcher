@@ -33,7 +33,13 @@ def main() -> None:
         logging.info("Starting observer")
         observer = Observer()
         observer.schedule(event_handler, config.path, recursive=True)
+        print(observer.event_queue.maxsize)
         observer.start()
+        # If backtrack is enabled, run the initial scan
+        if config.backtrack:
+            # Dispatch an empty event to trigger the initial scan
+            event_handler.dispatch(None)
+            
         logging.info(f"Watching for file events with INotify Observer in: {config.path}")
 
     except OSError:
