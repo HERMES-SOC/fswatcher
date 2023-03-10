@@ -5,7 +5,6 @@ import sys
 import time
 import logging
 from watchdog.observers import Observer
-from watchdog.observers.polling import PollingObserver
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
