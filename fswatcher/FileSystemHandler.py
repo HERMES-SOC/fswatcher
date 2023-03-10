@@ -536,7 +536,11 @@ class FileSystemHandler(FileSystemEventHandler):
 
             # Remove files that are already in S3
             files = list(set(files) - set(keys))
+            # Log the first 10 files
+            log.info(f"First 10 files: {files[:10]}")
 
+            # Log the first 10 keys
+            log.info(f"First 10 keys: {keys[:10]}")
             # Log the number of files that are not in S3
             log.info(f"Found {len(files)} files that are not in S3")
 
