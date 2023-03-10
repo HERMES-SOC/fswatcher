@@ -91,7 +91,9 @@ class FileSystemHandler(FileSystemEventHandler):
         self.timestream_table = config.timestream_table
 
         # Check s3
-        self.check_with_s3 = True
+        if os.getenv("CHECK_S3") == "true":
+            self.check_with_s3 = True
+
 
         # Initialize the slack client
         if config.slack_token is not None:
@@ -544,7 +546,7 @@ class FileSystemHandler(FileSystemEventHandler):
             # Log the number of files that are not in S3
             log.info(f"Found {len(files)} files that are not in S3")
 
-        # return files
+        return files
 
     # Check if the file is newer than the date filter
     def _check_date(self, file, date_filter):
