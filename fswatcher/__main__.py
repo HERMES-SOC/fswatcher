@@ -4,7 +4,7 @@ Main File for the AWS File System Watcher
 import sys
 import time
 import logging
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
@@ -32,7 +32,7 @@ def main() -> None:
     try:
         # Initialize the Observer and start watching
         logging.info("Starting observer")
-        observer = Observer()
+        observer = PollingObserver()
         observer.schedule(event_handler, config.path, recursive=True)
         print(observer.event_queue.maxsize)
         observer.start()
