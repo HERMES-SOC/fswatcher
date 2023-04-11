@@ -1,7 +1,7 @@
 import sys
 import time
 
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 
 from fswatcher import log
 from fswatcher.FileSystemHandler import FileSystemHandler
@@ -24,7 +24,7 @@ def main() -> None:
 
     # Initialize the Observer and start watching
     log.info("Starting observer")
-    observer = Observer()
+    observer = PollingObserver()
 
     try:
         observer.schedule(event_handler, config.path, recursive=True)
