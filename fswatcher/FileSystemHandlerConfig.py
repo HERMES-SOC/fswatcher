@@ -4,7 +4,7 @@ File System Handler Configuration Module
 
 from argparse import ArgumentParser
 
-from aws_sdc_utils.logging import log
+from sdc_aws_utils.logging import log
 
 
 class FileSystemHandlerConfig:

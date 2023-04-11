@@ -13,13 +13,13 @@ import boto3
 import botocore
 from boto3.s3.transfer import TransferConfig, S3Transfer
 
-from aws_sdc_utils.logging import log
-from aws_sdc_utils.aws import (
+from sdc_aws_utils.logging import log
+from sdc_aws_utils.aws import (
     create_timestream_client_session,
     log_to_timestream,
     object_exists,
 )
-from aws_sdc_utils.slack import get_slack_client, send_slack_notification
+from sdc_aws_utils.slack import get_slack_client, send_slack_notification
 
 from fswatcher.FileSystemHandlerEvent import FileSystemHandlerEvent
 from fswatcher.FileSystemHandlerConfig import FileSystemHandlerConfig
