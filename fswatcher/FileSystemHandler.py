@@ -75,6 +75,8 @@ class FileSystemHandler(FileSystemEventHandler):
             self.s3t = S3Transfer(self.s3_client, transfer_config)
             if config.timestream_db and config.timestream_table:
                 self.timestream_client = create_timestream_client_session()
+            else:
+                self.timestream_client = None
         except botocore.exceptions.ClientError as e:
             error_code = int(e.response["Error"]["Code"])
             if error_code == 404:
