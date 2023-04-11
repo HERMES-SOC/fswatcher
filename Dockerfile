@@ -20,6 +20,11 @@ COPY . /fswatcher
 # Set the working directory
 WORKDIR /fswatcher
 
+# Update pip and setuptools, also install setuptools_scm
+RUN pip install --no-cache-dir --upgrade pip setuptools setuptools_scm && \
+    # Clean up
+    rm -rf /root/.cache/pip
+
 # Install dependencies
 RUN pip install --no-cache-dir -r /fswatcher/requirements.txt && \
     # Clean up
