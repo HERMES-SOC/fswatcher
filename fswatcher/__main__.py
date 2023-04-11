@@ -7,6 +7,9 @@ from sdc_aws_utils.logging import log
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 
+# Change the log level to info
+log.setLevel("INFO")
+
 
 def main() -> None:
     """
