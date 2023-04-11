@@ -2,8 +2,8 @@ import sys
 import time
 
 from watchdog.observers import Observer
-from sdc_aws_utils.logging import log
 
+from fswatcher import log
 from fswatcher.FileSystemHandler import FileSystemHandler
 from fswatcher.FileSystemHandlerConfig import get_config
 

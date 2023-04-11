@@ -13,7 +13,7 @@ import boto3
 import botocore
 from boto3.s3.transfer import TransferConfig, S3Transfer
 
-from sdc_aws_utils.logging import log
+from fswatcher import log
 from sdc_aws_utils.aws import (
     create_timestream_client_session,
     log_to_timestream,
