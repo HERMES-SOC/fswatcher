@@ -1,18 +1,12 @@
 import os
 import time
-import psycopg2
+import sqlite3
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
 
 
 def init_db():
-    conn = psycopg2.connect(
-        dbname="your_database",
-        user="your_user",
-        password="your_password",
-        host="localhost",
-        port="5432",
-    )
+    conn = sqlite3.connect("file_info.db")
     cur = conn.cursor()
     cur.execute(
         """CREATE TABLE IF NOT EXISTS files (
@@ -27,10 +21,7 @@ def init_db():
 def update_files_info(conn, file_info):
     cur = conn.cursor()
     cur.execute(
-        """INSERT INTO files (file_path, modified_time)
-           VALUES (%s, %s)
-           ON CONFLICT (file_path) DO UPDATE
-           SET modified_time = EXCLUDED.modified_time""",
+        "REPLACE INTO files (file_path, modified_time) VALUES (?, ?)",
         (file_info["file_path"], file_info["modified_time"]),
     )
     conn.commit()
@@ -38,7 +29,7 @@ def update_files_info(conn, file_info):
 
 def delete_file_info(conn, file_path):
     cur = conn.cursor()
-    cur.execute("DELETE FROM files WHERE file_path=%s", (file_path,))
+    cur.execute("DELETE FROM files WHERE file_path=?", (file_path,))
     conn.commit()
 
 
@@ -46,47 +37,6 @@ def get_files_info(conn):
     cur = conn.cursor()
     cur.execute("SELECT file_path, modified_time FROM files")
     return {row[0]: row[1] for row in cur.fetchall()}
-
-
-# import os
-# import time
-# import sqlite3
-# from pathlib import Path
-# from concurrent.futures import ProcessPoolExecutor
-
-
-# def init_db():
-#     conn = sqlite3.connect("file_info.db")
-#     cur = conn.cursor()
-#     cur.execute(
-#         """CREATE TABLE IF NOT EXISTS files (
-#                        file_path TEXT PRIMARY KEY,
-#                        modified_time REAL)"""
-#     )
-
-#     conn.commit()
-#     return conn
-
-
-# def update_files_info(conn, file_info):
-#     cur = conn.cursor()
-#     cur.execute(
-#         "REPLACE INTO files (file_path, modified_time) VALUES (?, ?)",
-#         (file_info["file_path"], file_info["modified_time"]),
-#     )
-#     conn.commit()
-
-
-# def delete_file_info(conn, file_path):
-#     cur = conn.cursor()
-#     cur.execute("DELETE FROM files WHERE file_path=?", (file_path,))
-#     conn.commit()
-
-
-# def get_files_info(conn):
-#     cur = conn.cursor()
-#     cur.execute("SELECT file_path, modified_time FROM files")
-#     return {row[0]: row[1] for row in cur.fetchall()}
 
 
 def check_for_changes(conn, current_files_info):
