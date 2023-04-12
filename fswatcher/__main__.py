@@ -1,12 +1,12 @@
 import os
 import time
-import psycopg
+import psycopg3
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
 
 
 def init_db():
-    conn = psycopg.connect(
+    conn = psycopg3.connect(
         dbname="your_database",
         user="your_user",
         password="your_password",
