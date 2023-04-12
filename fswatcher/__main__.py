@@ -90,7 +90,7 @@ def process_files(conn, all_files):
 
 
 def main():
-    path = "./test_files"
+    path = "./watch"
     max_workers = 4
     check_interval = 0.5
 
