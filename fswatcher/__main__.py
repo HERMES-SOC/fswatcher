@@ -2,7 +2,7 @@ import os
 import time
 import sqlite3
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 
 def init_db():
@@ -87,9 +87,6 @@ def process_files(conn, all_files):
     return new_files, deleted_files
 
 
-# The rest of the code remains the same
-
-
 def main():
     path = "/watch"
     max_workers = 2
@@ -107,7 +104,7 @@ def main():
 
     conn = init_db()
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
         # while True:
         start = time.time()
         time.sleep(
