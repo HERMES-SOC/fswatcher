@@ -78,13 +78,15 @@ def check_path_exists(path):
 
 
 def walk_directory(
-    path, process_id=0, num_processes=1, excluded_files=[], excluded_exts=[]
+    path, process_id=0, num_processes=1, excluded_files=None, excluded_exts=None
 ):
     all_files = []
     for root, _, files in os.walk(path):
         if process_id == hash(root) % num_processes:
             for file in files:
-                if file in excluded_files or os.path.splitext(file)[1] in excluded_exts:
+                if (excluded_files and file in excluded_files) or (
+                    excluded_exts and os.path.splitext(file)[1] in excluded_exts
+                ):
                     continue
                 file_path = os.path.join(root, file)
                 file_mtime = os.path.getmtime(file_path)
