@@ -2,7 +2,7 @@ import os
 import time
 import sqlite3
 from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
 
 def init_db():
@@ -87,9 +87,12 @@ def process_files(conn, all_files):
     return new_files, deleted_files
 
 
+# The rest of the code remains the same
+
+
 def main():
-    path = "./watch"
-    max_workers = 1
+    path = "/watch"
+    max_workers = 2
     check_interval = 0
 
     # Add file names or extensions you want to exclude
