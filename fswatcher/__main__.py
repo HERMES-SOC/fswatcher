@@ -111,6 +111,7 @@ def main():
             check_interval
         )  # Wait for 60 seconds before checking for new files again
 
+        start_inner = time.time()
         # Submit tasks for all worker processes
         all_files_futures = [
             executor.submit(
@@ -126,7 +127,8 @@ def main():
         all_files = []
         for future in all_files_futures:
             all_files += future.result()
-
+        end_inner = time.time()
+        print(f"Time taken for inner loop: {end_inner - start_inner} seconds")
         print(f"Total files found: {len(all_files)}")
 
         # Check for new, updated, and deleted files
