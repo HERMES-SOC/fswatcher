@@ -2,4 +2,4 @@ boto3==1.26.35
 watchdog==2.2.0
 slack_sdk==3.19.5
 sdc_aws_utils @ git+https://github.com/HERMES-SOC/sdc_aws_utils.git
-psycopg3
+psycopg2-binary
