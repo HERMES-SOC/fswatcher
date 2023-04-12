@@ -102,7 +102,7 @@ def process_files(conn, all_files):
 
 def main():
     path = "/watch"
-    max_workers = 2
+    max_workers = 1
     check_interval = 0
 
     # Add file names or extensions you want to exclude
@@ -143,11 +143,12 @@ def main():
         # Check for new, updated, and deleted files
         new_files, deleted_files = process_files(conn, all_files)
 
-        if new_files:
-            print(f"New or updated files found: {new_files}")
-        if deleted_files:
-            print(f"Deleted files found: {deleted_files}")
-
+        # if new_files:
+        #     print(f"New or updated files found: {new_files}")
+        # if deleted_files:
+        #     print(f"Deleted files found: {deleted_files}")
+        # Print the size in bytes of the database
+        print(f"Database size: {os.path.getsize('file_info.db')} bytes")
         end = time.time()
         print(f"Time taken: {end - start} seconds")
 
