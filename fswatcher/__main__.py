@@ -2,7 +2,7 @@ import os
 import time
 import sqlite3
 from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def init_db():
@@ -104,15 +104,18 @@ def main():
 
     conn = init_db()
 
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor(
+        max_workers=max_workers
+    ) as executor:  # Use ThreadPoolExecutor
         # while True:
         start = time.time()
+        print("Checking for new files...")
         time.sleep(
             check_interval
         )  # Wait for 60 seconds before checking for new files again
 
         start_inner = time.time()
-        # Submit tasks for all worker processes
+        # Submit tasks for all worker threads
         all_files_futures = [
             executor.submit(
                 walk_directory,
@@ -123,21 +126,25 @@ def main():
             for i in range(max_workers)
         ]
 
-        # Collect results from all worker processes
+        # Collect results from all worker threads as they complete
         all_files = []
-        for future in all_files_futures:
+        for future in as_completed(all_files_futures):  # Use as_completed here
             all_files += future.result()
         end_inner = time.time()
         print(f"Time taken for inner loop: {end_inner - start_inner} seconds")
         print(f"Total files found: {len(all_files)}")
 
+        print("Checking for new or deleted files...")
+        start_inner = time.time()
         # Check for new, updated, and deleted files
         new_files, deleted_files = process_files(conn, all_files)
+        end_inner = time.time()
+        print(f"Time taken for inner loop: {end_inner - start_inner} seconds")
 
         if new_files:
-            print(f"New or updated files found: {new_files}")
+            print(f"New or updated files found: {len(new_files)}")
         if deleted_files:
-            print(f"Deleted files found: {deleted_files}")
+            print(f"Deleted files found: {len(deleted_files)}")
 
         end = time.time()
         print(f"Time taken: {end - start} seconds")
