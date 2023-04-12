@@ -10,8 +10,8 @@ def init_db():
         dbname="your_database",
         user="your_user",
         password="your_password",
-        host="your_host",
-        port="your_port",
+        host="localhost",
+        port="5432",
     )
     cur = conn.cursor()
     cur.execute(
