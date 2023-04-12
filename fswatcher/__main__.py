@@ -2,7 +2,7 @@ import os
 import time
 import sqlite3
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor
 
 
 def init_db():
@@ -71,13 +71,15 @@ def walk_directory(
     for root, _, files in os.walk(path):
         if process_id == hash(root) % num_processes:
             for file in files:
-                if (excluded_files and file in excluded_files) or (
-                    excluded_exts and os.path.splitext(file)[1] in excluded_exts
-                ):
-                    continue
-                file_path = os.path.join(root, file)
-                file_mtime = os.path.getmtime(file_path)
-                all_files.append((file_path, file_mtime))
+                if not excluded_files or not excluded_exts:
+                    if (
+                        file in excluded_files
+                        or os.path.splitext(file)[1] in excluded_exts
+                    ):
+                        continue
+                    file_path = os.path.join(root, file)
+                    file_mtime = os.path.getmtime(file_path)
+                    all_files.append((file_path, file_mtime))
     return all_files
 
 
@@ -88,13 +90,13 @@ def process_files(conn, all_files):
 
 
 def main():
-    path = "/watch"
-    max_workers = 2
-    check_interval = 0
+    path = "./test_files"
+    max_workers = 4
+    check_interval = 0.5
 
     # Add file names or extensions you want to exclude
-    # excluded_files = ["file_to_exclude.txt"]
-    # excluded_exts = [".log", ".tmp"]
+    excluded_files = ["file_to_exclude.txt"]
+    excluded_exts = [".log", ".tmp"]
 
     if not check_path_exists(path):
         print("Path does not exist, exiting...")
@@ -104,50 +106,41 @@ def main():
 
     conn = init_db()
 
-    with ThreadPoolExecutor(
-        max_workers=max_workers
-    ) as executor:  # Use ThreadPoolExecutor
-        # while True:
-        start = time.time()
-        print("Checking for new files...")
-        time.sleep(
-            check_interval
-        )  # Wait for 60 seconds before checking for new files again
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        while True:
+            start = time.time()
+            time.sleep(
+                check_interval
+            )  # Wait for 60 seconds before checking for new files again
+            inner_start = time.time()
+            # Submit tasks for all worker processes
+            all_files_futures = [
+                executor.submit(
+                    walk_directory,
+                    path,
+                    process_id=i,
+                    num_processes=max_workers,
+                    excluded_files=excluded_files,
+                    excluded_exts=excluded_exts,
+                )
+                for i in range(max_workers)
+            ]
+            inner_end = time.time()
+            print(f"Time taken for inner loop: {inner_end - inner_start}")
 
-        start_inner = time.time()
-        # Submit tasks for all worker threads
-        all_files_futures = [
-            executor.submit(
-                walk_directory,
-                path,
-                process_id=i,
-                num_processes=max_workers,
-            )
-            for i in range(max_workers)
-        ]
+            # Collect results from all worker processes
+            all_files = []
+            for future in all_files_futures:
+                all_files += future.result()
 
-        # Collect results from all worker threads as they complete
-        all_files = []
-        for future in as_completed(all_files_futures):  # Use as_completed here
-            all_files += future.result()
-        end_inner = time.time()
-        print(f"Time taken for inner loop: {end_inner - start_inner} seconds")
-        print(f"Total files found: {len(all_files)}")
-
-        print("Checking for new or deleted files...")
-        start_inner = time.time()
-        # Check for new, updated, and deleted files
-        new_files, deleted_files = process_files(conn, all_files)
-        end_inner = time.time()
-        print(f"Time taken for inner loop: {end_inner - start_inner} seconds")
-
-        if new_files:
-            print(f"New or updated files found: {len(new_files)}")
-        if deleted_files:
-            print(f"Deleted files found: {len(deleted_files)}")
-
-        end = time.time()
-        print(f"Time taken: {end - start} seconds")
+            # Check for new, updated, and deleted files
+            new_files, deleted_files = process_files(conn, all_files)
+            end = time.time()
+            print(f"Time taken: {end - start}")
+            if new_files:
+                print(f"New or updated files found: {len(new_files)}")
+            if deleted_files:
+                print(f"Deleted files found: {len(deleted_files)}")
 
 
 if __name__ == "__main__":
