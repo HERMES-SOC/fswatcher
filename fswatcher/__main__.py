@@ -131,8 +131,6 @@ def main():
                 path,
                 process_id=i,
                 num_processes=max_workers,
-                excluded_files=excluded_files,
-                excluded_exts=excluded_exts,
             )
             for i in range(max_workers)
         ]
