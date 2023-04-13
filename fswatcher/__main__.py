@@ -94,6 +94,9 @@ def main():
     max_workers = 2
     check_interval = 0
 
+    # Initialize excluded_files and excluded_exts as empty lists
+    excluded_files = []
+    excluded_exts = []
     # # Add file names or extensions you want to exclude
     # excluded_files = ["file_to_exclude.txt"]
     # excluded_exts = [".log", ".tmp"]
@@ -120,6 +123,8 @@ def main():
                 path,
                 process_id=i,
                 num_processes=max_workers,
+                excluded_files=excluded_files,
+                excluded_exts=excluded_exts,
             )
             for i in range(max_workers)
         ]
