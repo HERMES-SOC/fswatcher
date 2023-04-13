@@ -3,10 +3,17 @@ import time
 import sqlite3
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
+import psycopg2
 
 
 def init_db():
-    conn = sqlite3.connect("file_info.db")
+    conn = psycopg2.connect(
+        dbname="mydb",
+        user="postgres",
+        password="password",
+        host="localhost",
+        port="5432",
+    )
     cur = conn.cursor()
     cur.execute(
         """CREATE TABLE IF NOT EXISTS files (
@@ -21,7 +28,8 @@ def init_db():
 def update_files_info(conn, file_info):
     cur = conn.cursor()
     cur.execute(
-        "REPLACE INTO files (file_path, modified_time) VALUES (?, ?)",
+        "INSERT INTO files (file_path, modified_time) VALUES (%s, %s) "
+        "ON CONFLICT (file_path) DO UPDATE SET modified_time = EXCLUDED.modified_time",
         (file_info["file_path"], file_info["modified_time"]),
     )
     conn.commit()
@@ -29,7 +37,7 @@ def update_files_info(conn, file_info):
 
 def delete_file_info(conn, file_path):
     cur = conn.cursor()
-    cur.execute("DELETE FROM files WHERE file_path=?", (file_path,))
+    cur.execute("DELETE FROM files WHERE file_path=%s", (file_path,))
     conn.commit()
 
 
@@ -68,7 +76,7 @@ def walk_directory(
     path, process_id=0, num_processes=1, excluded_files=None, excluded_exts=None
 ):
     all_files = []
-    for root, _, files in os.walk(path):
+    for root, _, files in os.walk(path, followlinks=True):
         if process_id == hash(root) % num_processes:
             for file in files:
                 if not excluded_files or not excluded_exts:
@@ -78,8 +86,9 @@ def walk_directory(
                     ):
                         continue
                     file_path = os.path.join(root, file)
-                    file_mtime = os.path.getmtime(file_path)
-                    all_files.append((file_path, file_mtime))
+                    real_file_path = os.path.realpath(file_path)
+                    file_mtime = os.path.getmtime(real_file_path)
+                    all_files.append((real_file_path, file_mtime))
     return all_files
 
 
@@ -92,7 +101,7 @@ def process_files(conn, all_files):
 def main():
     path = "/watch"
     max_workers = 1
-    check_interval = 1
+    check_interval = 5
 
     # Initialize excluded_files and excluded_exts as empty lists
     excluded_files = []
