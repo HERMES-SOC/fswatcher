@@ -91,12 +91,12 @@ def process_files(conn, all_files):
 
 def main():
     path = "/watch"
-    max_workers = 4
-    check_interval = 0.5
+    max_workers = 2
+    check_interval = 0
 
-    # Add file names or extensions you want to exclude
-    excluded_files = ["file_to_exclude.txt"]
-    excluded_exts = [".log", ".tmp"]
+    # # Add file names or extensions you want to exclude
+    # excluded_files = ["file_to_exclude.txt"]
+    # excluded_exts = [".log", ".tmp"]
 
     if not check_path_exists(path):
         print("Path does not exist, exiting...")
@@ -107,40 +107,43 @@ def main():
     conn = init_db()
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        while True:
-            start = time.time()
-            time.sleep(
-                check_interval
-            )  # Wait for 60 seconds before checking for new files again
-            inner_start = time.time()
-            # Submit tasks for all worker processes
-            all_files_futures = [
-                executor.submit(
-                    walk_directory,
-                    path,
-                    process_id=i,
-                    num_processes=max_workers,
-                    excluded_files=excluded_files,
-                    excluded_exts=excluded_exts,
-                )
-                for i in range(max_workers)
-            ]
-            inner_end = time.time()
-            print(f"Time taken for inner loop: {inner_end - inner_start}")
+        # while True:
+        start = time.time()
+        time.sleep(
+            check_interval
+        )  # Wait for 60 seconds before checking for new files again
+        inner_start = time.time()
+        # Submit tasks for all worker processes
+        all_files_futures = [
+            executor.submit(
+                walk_directory,
+                path,
+                process_id=i,
+                num_processes=max_workers,
+            )
+            for i in range(max_workers)
+        ]
+        inner_end = time.time()
+        print(f"Time taken for inner loop: {inner_end - inner_start}")
 
-            # Collect results from all worker processes
-            all_files = []
-            for future in all_files_futures:
-                all_files += future.result()
+        # Collect results from all worker processes
+        all_files = []
+        for future in all_files_futures:
+            all_files += future.result()
 
-            # Check for new, updated, and deleted files
-            new_files, deleted_files = process_files(conn, all_files)
-            end = time.time()
-            print(f"Time taken: {end - start}")
-            if new_files:
-                print(f"New or updated files found: {len(new_files)}")
-            if deleted_files:
-                print(f"Deleted files found: {len(deleted_files)}")
+        # Check for new, updated, and deleted files
+        new_files, deleted_files = process_files(conn, all_files)
+        end = time.time()
+        print(f"Time taken: {end - start}")
+        print(f"Total files found: {len(all_files)}")
+        print(f"New or updated files found: {len(new_files)}")
+        print(f"Deleted files found: {len(deleted_files)}")
+        print(f"Size of db file: {os.path.getsize('file_info.db')} bytes")
+
+        # if new_files:
+        #     print(f"New or updated files found: {len(new_files)}")
+        # if deleted_files:
+        #     print(f"Deleted files found: {len(deleted_files)}")
 
 
 if __name__ == "__main__":
