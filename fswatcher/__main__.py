@@ -3,17 +3,10 @@ import time
 import sqlite3
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
-import psycopg2
 
 
 def init_db():
-    conn = psycopg2.connect(
-        dbname="mydb",
-        user="postgres",
-        password="password",
-        host="localhost",
-        port="5432",
-    )
+    conn = sqlite3.connect("file_info.db")
     cur = conn.cursor()
     cur.execute(
         """CREATE TABLE IF NOT EXISTS files (
@@ -28,8 +21,7 @@ def init_db():
 def update_files_info(conn, file_info):
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO files (file_path, modified_time) VALUES (%s, %s) "
-        "ON CONFLICT (file_path) DO UPDATE SET modified_time = EXCLUDED.modified_time",
+        "REPLACE INTO files (file_path, modified_time) VALUES (?, ?)",
         (file_info["file_path"], file_info["modified_time"]),
     )
     conn.commit()
@@ -37,7 +29,7 @@ def update_files_info(conn, file_info):
 
 def delete_file_info(conn, file_path):
     cur = conn.cursor()
-    cur.execute("DELETE FROM files WHERE file_path=%s", (file_path,))
+    cur.execute("DELETE FROM files WHERE file_path=?", (file_path,))
     conn.commit()
 
 
@@ -99,9 +91,9 @@ def process_files(conn, all_files):
 
 
 def main():
-    path = "/watch"
+    path = "/home/dbarrous/Downloads"
     max_workers = 1
-    check_interval = 5
+    check_interval = 1
 
     # Initialize excluded_files and excluded_exts as empty lists
     excluded_files = []
