@@ -333,7 +333,7 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Upload to S3 Bucket
             # If time since self.last_refresh is greater than 15 minutes refresh the boto session
-            if (datetime.now() - self.last_refresh_time).total_seconds() > 900:
+            if time.time() - self.last_refresh_time >= 900:  # 900 seconds = 15 minutes
                 self._refresh_boto_session()
             self.s3t.upload_file(
                 src_path,
@@ -393,7 +393,10 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             if self.allow_delete:
-                self._refresh_boto_session()
+                if (
+                    time.time() - self.last_refresh_time >= 900
+                ):  # 900 seconds = 15 minutes
+                    self._refresh_boto_session()
                 self.s3_client.delete_object(Bucket=bucket_name, Key=file_key)
 
                 log.info(
