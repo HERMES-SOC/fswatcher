@@ -52,6 +52,9 @@ class FileSystemHandler(FileSystemEventHandler):
         # Initialize the concurrency_limit (Max number of concurrent S3 Uploads)
         self.concurrency_limit = config.concurrency_limit
 
+        # Time since last refresh
+        self.last_refresh_time = time.time()
+
         # Check if bucket name is and accessible using boto
         try:
             # Initialize Boto3 Session
@@ -329,7 +332,9 @@ class FileSystemHandler(FileSystemEventHandler):
 
         try:
             # Upload to S3 Bucket
-            self._refresh_boto_session()
+            # If time since self.last_refresh is greater than 15 minutes refresh the boto session
+            if (datetime.datetime.now() - self.last_refresh_time).total_seconds() > 900:
+                self._refresh_boto_session()
             self.s3t.upload_file(
                 src_path,
                 bucket_name,
@@ -865,6 +870,7 @@ class FileSystemHandler(FileSystemEventHandler):
                 max_concurrency=self.concurrency_limit,
             )
             self.s3t = S3Transfer(self.s3_client, transfer_config)
+            self.last_refresh_time = time.time()
         except botocore.exceptions.ClientError as e:
             error_code = int(e.response["Error"]["Code"])
             if error_code == 404:
