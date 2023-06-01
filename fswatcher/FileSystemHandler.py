@@ -333,7 +333,7 @@ class FileSystemHandler(FileSystemEventHandler):
         try:
             # Upload to S3 Bucket
             # If time since self.last_refresh is greater than 15 minutes refresh the boto session
-            if (datetime.datetime.now() - self.last_refresh_time).total_seconds() > 900:
+            if (datetime.now() - self.last_refresh_time).total_seconds() > 900:
                 self._refresh_boto_session()
             self.s3t.upload_file(
                 src_path,
@@ -367,6 +367,7 @@ class FileSystemHandler(FileSystemEventHandler):
             log.info(self.dead_letter_queue)
 
         except botocore.exceptions.ClientError as e:
+            self._refresh_boto_session()
             log.error(
                 {"status": "ERROR", "message": f"Error uploading to S3 Bucket: {e}"}
             )
