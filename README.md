@@ -45,8 +45,8 @@ There are a multitude of configurable environmental variables that can be set in
 * `BACKTRACK_DATE` - The date to backtrack to. (Optional)
 * `CHECK_S3` - If enabled, it checks against S3 when backtracking.
 * `USE_FALLBACK` - If enabled, it uses a fallback watcher. This is Linux-only and uses a slower directory walking and DB lookup method. It might work better for larger filesystems and files that might not cause any FSEvents to be created.
-* `FILE_LOGGING` - If enabled, it stores a log file within the container.
-* `LOG_DIR` - The directory for logging if you'd like to persist the log to your host system.
+* `FILE_LOGGING` - If enabled, it stores a log file within the container. This variable must be enabled in order to use the LOG_DIR variable to write logs to the host system.
+* `LOG_DIR` - The directory for logging if you'd like to write the log to your host system.
 * `BOTO3_LOGGING` - If enabled, it activates Botocore logging for more in-depth logs.
 * `TIMESTREAM_DB` - The name of the Timestream database. (Optional)
 * `TIMESTREAM_TABLE` - The name of the Timestream table. (Optional)
