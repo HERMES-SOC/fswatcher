@@ -145,10 +145,12 @@ USE_FALLBACK=true
 # SLACK_CHANNEL=slack_channel_id
 ```
 ### Setup
-1. Clone the repository
+1. Clone the repository using https or ssh
+   
+   ```git clone https://github.com/HERMES-SOC/fswatcher.git```
 
     ```git clone git@github.com:HERMES-SOC/fswatcher.git```
-
+   
 2. Configure the `fswatcher.config` in the `scripts` folder. Look at [Configurable Variables](#configurable-variables) for more information on the variables.
 
 3. Verify your AWS CLI is configured with access keys (Optional)
