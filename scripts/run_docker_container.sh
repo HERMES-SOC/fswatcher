@@ -229,10 +229,21 @@ docker run -d \
     --network=host \
     $IMAGE_NAME
 
-# Print the docker logs
-echo "Docker logs"
-
-# Docker ps
+# Print running docker containers:
+echo ""
+echo ""
+echo "Running docker containers:"
+echo ""
 docker ps
+
+# Tail the docker logs
+container_logs=$(docker ps | awk 'NR == 2 {print $1}')
+if [[ $FOLLOW_LOGS == true ]]; then
+echo ""
+echo ""
+echo "Following $CONTAINER_NAME container logs:"
+echo ""
+docker logs -f $container_logs
+fi
 
 # Path: scripts/run_docker_container.sh
