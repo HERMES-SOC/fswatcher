@@ -238,6 +238,15 @@ Manually:
 
     ```docker image rm <image-name>```
 
+Install Files Removal: 
+
+1. Remove the installation files created from git clone:
+
+    ```cd <installation_directory>```
+
+    ```rm -rf fswatcher```
+ 
+
 ## License
 FSWatcher is licensed under the MIT License. Please check the [LICENSE](LICENSE) file in the repo for more information.
 
