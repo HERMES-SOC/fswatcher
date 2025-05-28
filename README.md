@@ -48,6 +48,7 @@ There are a multitude of configurable environmental variables that can be set in
 * `FILE_LOGGING` - If enabled, it stores a log file within the container. This variable must be enabled in order to use the LOG_DIR variable to write logs to the host system.
 * `LOG_DIR` - The directory for logging if you'd like to write the log to your host system.
 * `BOTO3_LOGGING` - If enabled, it activates Botocore logging for more in-depth logs.
+* `FOLLOW_LOGS` - If enabled, run_docker_container.sh will automatically follow the docker container logs as the container starts up. This can be useful for troubleshooting container startup issues or verifying file sync capability.
 * `TIMESTREAM_DB` - The name of the Timestream database. (Optional)
 * `TIMESTREAM_TABLE` - The name of the Timestream table. (Optional)
 * `SLACK_TOKEN` - The Slack token for sending logs to Slack. (Optional)
