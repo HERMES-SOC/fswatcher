@@ -127,6 +127,9 @@ USE_FALLBACK=true
 # Boto3 Logging, enables Botocore logging for more in depth logs
 # BOTO3_LOGGING=false
 
+# Follow docker container logs for container startup and file sync verification
+# FOLLOW_LOGS=true
+
 # ========================
 # TimeStream configurations (optional)
 # ========================
