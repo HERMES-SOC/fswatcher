@@ -122,7 +122,7 @@ USE_FALLBACK=true
 # FILE_LOGGING=false
 
 # Log Directory (If you'd like to persist the log to your host system)
-# LOG_DIR=~/fswatcher_log
+LOG_DIR=$(cd .. && pwd)
 
 # Boto3 Logging, enables Botocore logging for more in depth logs
 # BOTO3_LOGGING=false
@@ -149,28 +149,27 @@ USE_FALLBACK=true
 # SLACK_CHANNEL=slack_channel_id
 ```
 ### Setup
-1. Clone the repository using https or ssh
+1. Clone the repository using https or ssh:
    
    ```git clone https://github.com/HERMES-SOC/fswatcher.git```
 
     ```git clone git@github.com:HERMES-SOC/fswatcher.git```
    
-2. Configure the `fswatcher.config` in the `scripts` folder. Look at [Configurable Variables](#configurable-variables) for more information on the variables.
+2. Configure the `fswatcher.config` file in the `scripts` folder. Look at [Configurable Variables](#configurable-variables) for more information on the variables.
 
-3. Verify your AWS CLI is configured with access keys (Optional)
+3. Verify your AWS CLI is configured with access keys (Optional):
 
     ```aws configure```
 
-    Note: It must have access to the S3 bucket and Timestream table without MFA(if you want to use it)
+    Note: It must have access to the S3 bucket and Timestream table without MFA (if you want to use it).
 
-
-4. Run the container run script
+4. Run the `run_docker_container.sh` script to start the Docker container:
 
     ```cd scripts && ./run_docker_container```
 
-    Note: This will build and run the docker container in detached mode with your container running
+    Note: This will build and run the Docker container in detached mode.
 
-5. Verify the service is running
+5. Verify the Docker container is running:
 
     ```docker logs <name-of-container>```
 
