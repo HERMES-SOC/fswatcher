@@ -177,30 +177,30 @@ USE_FALLBACK=true
 
 ## Usage
 ### Adding files
-1. Add a file to the `SDC_AWS_WATCH_PATH` directory
+1. Add a file to the directory being watched as defined in the `WATCH_DIR` parameter:
 
-    ```touch /path/to/SDC_AWS_WATCH_PATH/test.txt```
+    ```touch /path/to/WATCH_DIR/test.txt```
 
-2. Verify the file was uploaded to the `SDC_AWS_S3_BUCKET` bucket
+2. Verify the file was uploaded to the AWS S3 Bucket as defined in the `S3_BUCKET_NAME` parameter:
 
-    ```aws s3 ls s3://SDC_AWS_S3_BUCKET/```
+    ```aws s3 ls s3://S3_BUCKET_NAME/```
 
-3. Verify the file was tagged with the creation and modified time
+3. Verify the file was tagged with the creation and modified time:
 
     ```aws s3api head-object --bucket SDC_AWS_S3_BUCKET --key test.txt```
 
-4. Verify the file was logged to the `SDC_AWS_TIMESTREAM_TABLE` table (optional)
+4. Verify the file was logged to the `SDC_AWS_TIMESTREAM_TABLE` table (optional):
 
     ```aws timestream-query query --query-string "SELECT * FROM SDC_AWS_TIMESTREAM_DB.SDC_AWS_TIMESTREAM_TABLE"```
 
 ### Modifying files
-1. Modify the file in the `SDC_AWS_WATCH_PATH` directory
+1. Modify the file in the directory being watched as defined in the `WATCH_DIR` parameter:
 
-    ```echo "test" >> /path/to/SDC_AWS_WATCH_PATH/test.txt```
+    ```echo "test" >> /path/to/WATCH_DIR/test.txt```
 
-2. Verify the file was uploaded to the `SDC_AWS_S3_BUCKET` bucket
+2. Verify the file was uploaded to the AWS S3 Bucket as defined in the `S3_BUCKET_NAME` parameter:
 
-    ```aws s3 ls s3://SDC_AWS_S3_BUCKET/```
+    ```aws s3 ls s3://S3_BUCKET_NAME/```
 
 3. Verify the file was tagged with the creation and modified time
 
