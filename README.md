@@ -8,6 +8,9 @@ You also can configure the system to log the `CREATE`, `UPDATE`, `PUT` and `DELE
 
 As well as the ability to configure slack notification for when new Files are detected and if there is a manifest file it lists the content of the file in the slack message.
 
+Used by (if you use this tool please let us know!)
+* NASA Heliophysics Solar Archive - [Solar Data Analysis Center](https://umbra.nascom.nasa.gov/index.html/)
+
 ## Table of Contents
 - [FSWatcher](#fswatcher)
   - [Table of Contents](#table-of-contents)
